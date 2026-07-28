@@ -1,0 +1,32 @@
+import { Question, uuid } from "@/lib/constants";
+
+export const ENQUETE_TEMPLATE = {
+  title: "Impact de la prise en charge par appareillage orthopédique des patients atteints de coxarthrose",
+  description: "CNAO – Centre National d'Appareillage Orthopédique, Lomé",
+  questions: [
+    { type: "number" as const, text: "Âge", unit: "ans", min: 0, max: 120 },
+    { type: "single" as const, text: "Sexe", options: ["Homme", "Femme"] },
+    { type: "text" as const, text: "Profession" },
+    { type: "single" as const, text: "Niveau d'instruction", options: ["Aucun", "Primaire", "Secondaire", "Supérieur"] },
+    { type: "single" as const, text: "Situation matrimoniale", options: ["Célibataire", "Marié(e)", "Divorcé(e)", "Veuf(ve)"] },
+    { type: "text" as const, text: "Lieu de résidence" },
+    { type: "single" as const, text: "Ancienneté de la coxarthrose", options: ["<6 mois", "6 mois-1 an", "1-5 ans", ">5 ans"] },
+    { type: "single" as const, text: "Hanche atteinte", options: ["Droite", "Gauche", "Bilatérale"] },
+    { type: "single" as const, text: "Diagnostic radiographique", options: ["Oui", "Non"] },
+    { type: "text" as const, text: "Autres maladies" },
+    { type: "single" as const, text: "Appareillage", options: ["Canne simple", "Canne anglaise", "Béquilles", "Déambulateur", "Orthèse", "Autre"] },
+    { type: "single" as const, text: "Durée d'utilisation", options: ["<3 mois", "3-6 mois", "6-12 mois", ">1 an"] },
+    { type: "single" as const, text: "Utilisation quotidienne", options: ["Oui", "Non"] },
+    { type: "single" as const, text: "Respect des conseils", options: ["Toujours", "Souvent", "Rarement", "Jamais"] },
+    { type: "number" as const, text: "Douleur avant appareillage (EVA)", unit: "/10", min: 0, max: 10 },
+    { type: "number" as const, text: "Douleur après appareillage (EVA)", unit: "/10", min: 0, max: 10 },
+    { type: "single" as const, text: "Marche", options: ["Beaucoup améliorée", "Améliorée", "Inchangée", "Dégradée"] },
+    { type: "single" as const, text: "Escaliers", options: ["Plus facile", "Identique", "Plus difficile"] },
+    { type: "single" as const, text: "Distance parcourue", options: ["Plus", "Même", "Moins"] },
+    { type: "single" as const, text: "Activités quotidiennes", options: ["Beaucoup facilitées", "Facilitées", "Inchangées", "Plus difficiles"] },
+    { type: "single" as const, text: "Satisfaction", options: ["Très satisfait", "Satisfait", "Peu satisfait", "Pas satisfait"] },
+    { type: "single" as const, text: "Recommanderiez-vous l'appareillage ?", options: ["Oui", "Non"] },
+    { type: "single" as const, text: "Qualité de vie", options: ["Beaucoup améliorée", "Améliorée", "Inchangée", "Dégradée"] },
+    { type: "text" as const, text: "Difficultés rencontrées" },
+  ].map((q) => ({ id: uuid(), ...q })) as Question[],
+};

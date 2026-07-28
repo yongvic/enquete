@@ -1,0 +1,120 @@
+{
+  "common": {
+    "appName": "Sondages",
+    "back": "Retour",
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "copy": "Copier",
+    "copied": "Copié",
+    "share": "Partager",
+    "download": "Télécharger",
+    "admin": "Administration",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "Créer un compte"
+  },
+  "home": {
+    "title": "Créez un sondage.\nLisez les résultats.",
+    "subtitle": "Compte admin pour créer et analyser. Les répondants participent sans inscription — partagez le lien ou le code.",
+    "create": "Créer un sondage",
+    "createDesc": "Composez vos questions et publiez",
+    "answer": "Répondre",
+    "answerDesc": "Entrez un code ou ouvrez le lien reçu",
+    "results": "Voir les résultats",
+    "resultsDesc": "Statistiques et graphiques (admin)",
+    "recentSurveys": "Vos sondages récents",
+    "noAccountRespondent": "Réponse sans compte"
+  },
+  "auth": {
+    "loginTitle": "Connexion admin",
+    "registerTitle": "Créer un compte admin",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "loginButton": "Se connecter",
+    "registerButton": "S'inscrire",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "invalidCredentials": "Email ou mot de passe incorrect"
+  },
+  "create": {
+    "newSurvey": "Nouveau sondage",
+    "blankSurvey": "repartir d'un sondage vierge",
+    "templateHint": "Pré-rempli à partir de votre fiche d'enquête — {count} questions. Relisez, ajustez si besoin, puis publiez.",
+    "titlePlaceholder": "Titre du sondage",
+    "descriptionPlaceholder": "Description (facultatif)",
+    "addQuestion": "Ajouter une question",
+    "publish": "Publier le sondage",
+    "publishing": "Publication…",
+    "questionLabel": "Q{index}",
+    "questionPlaceholder": "Intitulé de la question",
+    "addOption": "+ option",
+    "types": {
+      "single": "Choix unique",
+      "multi": "Choix multiple",
+      "rating": "Note (1 à 5)",
+      "number": "Nombre",
+      "text": "Réponse libre"
+    },
+    "ratingHint": "Les répondants noteront de 1 (faible) à 5 (élevé).",
+    "textHint": "Réponse en texte libre.",
+    "min": "min",
+    "max": "max",
+    "unit": "unité",
+    "unitPlaceholder": "ans, /10…",
+    "errors": {
+      "title": "Donnez un titre à votre sondage.",
+      "questions": "Ajoutez au moins une question.",
+      "questionText": "Chaque question doit avoir un intitulé.",
+      "options": "Chaque question à choix doit avoir au moins 2 options.",
+      "publish": "Échec de la publication. Réessayez."
+    }
+  },
+  "created": {
+    "title": "Sondage publié",
+    "subtitle": "Partagez ce lien ou ce code pour recueillir des réponses.",
+    "testAnswer": "Tester la réponse",
+    "viewResults": "Voir les résultats",
+    "shareLink": "Lien de partage",
+    "qrCode": "QR code",
+    "downloadQr": "Télécharger le QR"
+  },
+  "answer": {
+    "enterCode": "Entrez le code",
+    "title": "Répondre à un sondage",
+    "load": "Charger le sondage",
+    "submit": "Envoyer ma réponse",
+    "submitting": "Envoi…",
+    "thanks": "Merci !",
+    "thanksDesc": "Votre réponse a été enregistrée.",
+    "backHome": "Retour à l'accueil",
+    "placeholder": "Votre réponse…",
+    "errors": {
+      "notFound": "Aucun sondage trouvé pour ce code.",
+      "invalid": "Ce sondage est illisible.",
+      "submit": "Échec de l'envoi. Réessayez."
+    }
+  },
+  "results": {
+    "title": "Résultats",
+    "enterCode": "Entrez le code du sondage",
+    "load": "Charger les résultats",
+    "responses": "{count} réponse reçue",
+    "responses_plural": "{count} réponses reçues",
+    "noResponses": "Aucune réponse pour l'instant. Partagez le code {code} pour en collecter.",
+    "otherSurvey": "Autre sondage",
+    "quickAccess": "Accès rapide",
+    "viewSimple": "Vue simple",
+    "viewChart": "Vue graphique",
+    "average": "Moyenne",
+    "minMax": "min {min} · max {max}",
+    "noTextAnswers": "Pas encore de réponse.",
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "errors": {
+      "notFound": "Aucun sondage trouvé pour ce code.",
+      "invalid": "Ce sondage est illisible.",
+      "unauthorized": "Accès réservé au créateur du sondage."
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "common": {
+    "appName": "Surveys",
+    "back": "Back",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "download": "Download",
+    "admin": "Administration",
+    "logout": "Sign out",
+    "login": "Sign in",
+    "register": "Create account"
+  },
+  "home": {
+    "title": "Create a survey.\nRead the results.",
+    "subtitle": "Admin account to create and analyze. Respondents join without signing up — share the link or code.",
+    "create": "Create a survey",
+    "createDesc": "Compose your questions and publish",
+    "answer": "Respond",
+    "answerDesc": "Enter a code or open the link you received",
+    "results": "View results",
+    "resultsDesc": "Statistics and charts (admin)",
+    "recentSurveys": "Your recent surveys",
+    "noAccountRespondent": "No account required"
+  },
+  "auth": {
+    "loginTitle": "Admin sign in",
+    "registerTitle": "Create admin account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "loginButton": "Sign in",
+    "registerButton": "Sign up",
+    "noAccount": "No account yet?",
+    "hasAccount": "Already have an account?",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "create": {
+    "newSurvey": "New survey",
+    "blankSurvey": "start from a blank survey",
+    "templateHint": "Pre-filled from your enquiry form — {count} questions. Review, adjust if needed, then publish.",
+    "titlePlaceholder": "Survey title",
+    "descriptionPlaceholder": "Description (optional)",
+    "addQuestion": "Add a question",
+    "publish": "Publish survey",
+    "publishing": "Publishing…",
+    "questionLabel": "Q{index}",
+    "questionPlaceholder": "Question text",
+    "addOption": "+ option",
+    "types": {
+      "single": "Single choice",
+      "multi": "Multiple choice",
+      "rating": "Rating (1 to 5)",
+      "number": "Number",
+      "text": "Free text"
+    },
+    "ratingHint": "Respondents will rate from 1 (low) to 5 (high).",
+    "textHint": "Free text answer.",
+    "min": "min",
+    "max": "max",
+    "unit": "unit",
+    "unitPlaceholder": "years, /10…",
+    "errors": {
+      "title": "Please give your survey a title.",
+      "questions": "Add at least one question.",
+      "questionText": "Each question needs a label.",
+      "options": "Each choice question needs at least 2 options.",
+      "publish": "Publishing failed. Please try again."
+    }
+  },
+  "created": {
+    "title": "Survey published",
+    "subtitle": "Share this link or code to collect responses.",
+    "testAnswer": "Test response",
+    "viewResults": "View results",
+    "shareLink": "Share link",
+    "qrCode": "QR code",
+    "downloadQr": "Download QR"
+  },
+  "answer": {
+    "enterCode": "Enter the code",
+    "title": "Respond to a survey",
+    "load": "Load survey",
+    "submit": "Submit my response",
+    "submitting": "Sending…",
+    "thanks": "Thank you!",
+    "thanksDesc": "Your response has been recorded.",
+    "backHome": "Back to home",
+    "placeholder": "Your answer…",
+    "errors": {
+      "notFound": "No survey found for this code.",
+      "invalid": "This survey could not be read.",
+      "submit": "Submission failed. Please try again."
+    }
+  },
+  "results": {
+    "title": "Results",
+    "enterCode": "Enter the survey code",
+    "load": "Load results",
+    "responses": "{count} response received",
+    "responses_plural": "{count} responses received",
+    "noResponses": "No responses yet. Share code {code} to collect some.",
+    "otherSurvey": "Another survey",
+    "quickAccess": "Quick access",
+    "viewSimple": "Simple view",
+    "viewChart": "Chart view",
+    "average": "Average",
+    "minMax": "min {min} · max {max}",
+    "noTextAnswers": "No answers yet.",
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "errors": {
+      "notFound": "No survey found for this code.",
+      "invalid": "This survey could not be read.",
+      "unauthorized": "Access restricted to the survey creator."
+    }
+  }
+}
