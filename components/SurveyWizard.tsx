@@ -14,11 +14,12 @@ import {
   ClipboardList,
   Save,
   Asterisk,
+  BookOpen,
 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { publishSurvey, saveDraft } from "@/lib/actions/survey";
+import { loadEnqueteTemplateForUser } from "@/lib/actions/template";
 import { INK, OCHRE, RUST, SLATE, Question, QuestionType, uuid } from "@/lib/constants";
-import { ENQUETE_TEMPLATE } from "@/lib/templates/enquete";
 
 const QUESTION_TYPES: QuestionType[] = ["single", "multi", "rating", "number", "text"];
 
@@ -36,6 +37,7 @@ interface DraftSummary {
 
 interface SurveyWizardProps {
   drafts?: DraftSummary[];
+  canUseTemplate?: boolean;
   initialDraft?: {
     id: string;
     title: string;
@@ -44,7 +46,7 @@ interface SurveyWizardProps {
   } | null;
 }
 
-export function SurveyWizard({ drafts = [], initialDraft = null }: SurveyWizardProps) {
+export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft = null }: SurveyWizardProps) {
   const t = useTranslations("wizard");
   const tc = useTranslations("create");
   const router = useRouter();
@@ -88,10 +90,19 @@ export function SurveyWizard({ drafts = [], initialDraft = null }: SurveyWizardP
     setStep("info");
   };
 
-  const startTemplate = () => {
-    setTitle(ENQUETE_TEMPLATE.title);
-    setDescription(ENQUETE_TEMPLATE.description);
-    setQuestions(ENQUETE_TEMPLATE.questions.map((q) => ({ ...q, id: uuid() })));
+  const startTemplate = async () => {
+    setBusy(true);
+    setError("");
+    const result = await loadEnqueteTemplateForUser();
+    setBusy(false);
+    if (result.error || !result.template) {
+      setError(t("templateForbidden"));
+      return;
+    }
+    const template = result.template;
+    setTitle(template.title);
+    setDescription(template.description);
+    setQuestions(template.questions.map((q) => ({ ...q, id: uuid() })));
     setDraftId(undefined);
     setStep("info");
   };
@@ -184,17 +195,45 @@ export function SurveyWizard({ drafts = [], initialDraft = null }: SurveyWizardP
                 {t("blankDesc")}
               </div>
             </button>
-            <button
-              onClick={startTemplate}
-              className="sondage-btn text-left p-5 w-full"
-              style={{ border: `1px solid ${SLATE}55` }}
-            >
-              <ClipboardList size={20} style={{ color: OCHRE }} />
-              <div className="mt-3 font-bold">{t("template")}</div>
-              <div className="sondage-sans text-sm mt-1" style={{ color: `${INK}99` }}>
-                {t("templateDesc")}
+            {canUseTemplate ? (
+              <button
+                onClick={startTemplate}
+                disabled={busy}
+                className="sondage-btn text-left p-5 w-full"
+                style={{ border: `1px solid ${SLATE}55` }}
+              >
+                <ClipboardList size={20} style={{ color: OCHRE }} />
+                <div className="mt-3 font-bold">{t("template")}</div>
+                <div className="sondage-sans text-sm mt-1" style={{ color: `${INK}99` }}>
+                  {t("templateDesc")}
+                </div>
+              </button>
+            ) : (
+              <div
+                className="p-5 rounded-sm"
+                style={{ border: `1px solid ${SLATE}55`, background: `${SLATE}08` }}
+              >
+                <BookOpen size={20} style={{ color: OCHRE }} />
+                <div className="mt-3 font-bold">{t("guideTitle")}</div>
+                <p className="sondage-sans text-sm mt-2" style={{ color: `${INK}99` }}>
+                  {t("guideIntro")}
+                </p>
+                <ol className="sondage-sans text-sm mt-3 flex flex-col gap-2 list-decimal list-inside" style={{ color: INK }}>
+                  <li>{t("guideStep1")}</li>
+                  <li>{t("guideStep2")}</li>
+                  <li>{t("guideStep3")}</li>
+                  <li>{t("guideStep4")}</li>
+                  <li>{t("guideStep5")}</li>
+                </ol>
+                <button
+                  onClick={startBlank}
+                  className="sondage-btn sondage-sans text-sm mt-4 px-4 py-2"
+                  style={{ border: `1px solid ${INK}` }}
+                >
+                  {t("guideCta")}
+                </button>
               </div>
-            </button>
+            )}
           </div>
           {drafts.length > 0 && (
             <div className="mt-8">

@@ -27,11 +27,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const valid = await bcrypt.compare(String(credentials.password), user.passwordHash);
         if (!valid) return null;
 
+        const { resolveRoleForEmail } = await import("@/lib/roles");
+        const role = resolveRoleForEmail(email);
+        if (user.role !== role) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role },
+          });
+        }
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role,
         };
       },
     }),
