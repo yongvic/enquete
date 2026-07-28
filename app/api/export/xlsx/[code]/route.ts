@@ -1,5 +1,5 @@
 import { getAuthorizedSurveyExport } from "@/lib/export-report";
-import { buildSurveyPdf } from "@/lib/pdf-report";
+import { buildSurveyXlsx } from "@/lib/xlsx-report";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -12,12 +12,12 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const buffer = buildSurveyPdf(data.survey, data.questions, data.responses);
+  const buffer = await buildSurveyXlsx(data.survey, data.questions, data.responses);
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="rapport-${data.survey.code}.pdf"`,
+      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="rapport-${data.survey.code}.xlsx"`,
     },
   });
 }

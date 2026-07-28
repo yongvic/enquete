@@ -82,15 +82,25 @@ export function ResultsView({ initialCode }: ResultsViewProps) {
         <div className="flex gap-2 flex-wrap">
           <a
             href={`/api/export/csv/${survey.code}`}
-            className="sondage-btn sondage-sans text-xs px-3 py-2"
+            className="sondage-btn sondage-sans text-xs px-3 py-2 flex-1 sm:flex-none text-center"
             style={{ border: `1px solid ${INK}` }}
+            title={t("exportCsvHint")}
           >
             {t("exportCsv")}
           </a>
           <a
+            href={`/api/export/xlsx/${survey.code}`}
+            className="sondage-btn sondage-sans text-xs px-3 py-2 flex-1 sm:flex-none text-center"
+            style={{ border: `1px solid ${INK}` }}
+            title={t("exportXlsxHint")}
+          >
+            {t("exportXlsx")}
+          </a>
+          <a
             href={`/api/export/pdf/${survey.code}`}
-            className="sondage-btn sondage-sans text-xs px-3 py-2 text-white"
+            className="sondage-btn sondage-sans text-xs px-3 py-2 flex-1 sm:flex-none text-center text-white"
             style={{ background: INK }}
+            title={t("exportPdfHint")}
           >
             {t("exportPdf")}
           </a>

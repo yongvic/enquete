@@ -16,6 +16,7 @@
     "@auth/prisma-adapter": "^2.7.4",
     "@prisma/client": "^6.3.1",
     "bcryptjs": "^2.4.3",
+    "exceljs": "^4.4.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.474.0",

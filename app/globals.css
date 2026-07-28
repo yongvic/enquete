@@ -119,6 +119,24 @@ body {
   border: 1px solid color-mix(in srgb, var(--slate) 40%, transparent);
 }
 
+.sondage-question-missing {
+  padding-left: 10px;
+  margin-left: -10px;
+  border-left: 3px solid var(--rust);
+}
+
+.sondage-question-text-error {
+  text-decoration: underline;
+  text-decoration-color: var(--rust);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.sondage-question-missing .sondage-input,
+.sondage-question-missing .sondage-option {
+  border-bottom-color: color-mix(in srgb, var(--rust) 55%, var(--slate));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sondage-btn,
   * {

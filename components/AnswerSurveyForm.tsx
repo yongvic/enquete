@@ -49,15 +49,19 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
     setCode(c);
   };
 
-  const setAnswer = (qid: string, val: string | number | string[] | undefined) =>
+  const setAnswer = (qid: string, val: string | number | string[] | undefined) => {
     setAnswers((a) => ({ ...a, [qid]: val }));
+    setMissingIds((ids) => ids.filter((id) => id !== qid));
+  };
 
-  const toggleMulti = (qid: string, opt: string) =>
+  const toggleMulti = (qid: string, opt: string) => {
     setAnswers((a) => {
       const cur = (a[qid] as string[]) || [];
       const next = cur.includes(opt) ? cur.filter((o) => o !== opt) : [...cur, opt];
       return { ...a, [qid]: next };
     });
+    setMissingIds((ids) => ids.filter((id) => id !== qid));
+  };
 
   const submit = async () => {
     if (!survey) return;
@@ -65,6 +69,8 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
     if (missing.length > 0) {
       setMissingIds(missing.map((q) => q.id));
       setError(t("errors.required", { count: missing.length }));
+      const first = document.getElementById(`q-${missing[0].id}`);
+      first?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setMissingIds([]);
@@ -145,22 +151,19 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
       )}
 
       <div className="flex flex-col gap-7 mt-7">
-        {survey.questions.map((q, i) => (
+        {survey.questions.map((q, i) => {
+          const isMissing = missingIds.includes(q.id);
+          return (
           <div
             key={q.id}
             id={`q-${q.id}`}
-            className="scroll-mt-4"
-            style={
-              missingIds.includes(q.id)
-                ? { borderLeft: `3px solid ${RUST}`, paddingLeft: 12, marginLeft: -12 }
-                : undefined
-            }
+            className={`scroll-mt-4 ${isMissing ? "sondage-question-missing" : ""}`}
           >
             <div className="sondage-sans font-semibold text-[15px] leading-snug">
               <span className="sondage-mono text-xs mr-2" style={{ color: SLATE }}>
                 Q{i + 1}
               </span>
-              {q.text}
+              <span className={isMissing ? "sondage-question-text-error" : undefined}>{q.text}</span>
               {isQuestionRequired(q) ? (
                 <span className="sondage-required-badge sondage-required-badge--yes">{t("required")}</span>
               ) : (
@@ -236,7 +239,7 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
               )}
             </div>
           </div>
-        ))}
+        );})}
       </div>
 
       {error && (
