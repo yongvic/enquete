@@ -40,6 +40,7 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
     }
     setSurvey({
       ...data,
+      code: data.code!,
       questions: data.questions as unknown as Question[],
     });
     setAnswers({});

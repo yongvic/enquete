@@ -1,3 +1,4 @@
+import { SurveyStatus } from "@prisma/client";
 import { Header } from "@/components/Header";
 import { SharePanel } from "@/components/SharePanel";
 import { requireAuth } from "@/lib/session";
@@ -14,12 +15,18 @@ export default async function PublishedPage({
   setRequestLocale(locale);
   const session = await requireAuth(locale);
 
-  const survey = await prisma.survey.findUnique({ where: { code: code.toUpperCase() } });
-  if (!survey || survey.userId !== session.user.id) notFound();
+  const survey = await prisma.survey.findFirst({
+    where: {
+      code: code.toUpperCase(),
+      status: SurveyStatus.PUBLISHED,
+      userId: session.user.id,
+    },
+  });
+  if (!survey?.code) notFound();
 
   return (
     <>
-      <Header isAdmin />
+      <Header isLoggedIn role={session.user.role} />
       <div className="px-5 sm:px-8 pb-10 pt-2 max-w-2xl mx-auto">
         <SharePanel code={survey.code} />
       </div>

@@ -9,25 +9,26 @@
     "share": "Partager",
     "download": "Télécharger",
     "admin": "Administration",
+    "dashboard": "Mon espace",
+    "superadmin": "Superadmin",
     "logout": "Déconnexion",
     "login": "Connexion",
     "register": "Créer un compte"
   },
   "home": {
     "title": "Créez un sondage.\nLisez les résultats.",
-    "subtitle": "Compte admin pour créer et analyser. Les répondants participent sans inscription — partagez le lien ou le code.",
-    "create": "Créer un sondage",
-    "createDesc": "Composez vos questions et publiez",
+    "subtitle": "Inscrivez-vous pour créer et analyser vos sondages. Les répondants participent sans compte — partagez le lien ou le code.",
+    "create": "Créer un compte",
+    "createDesc": "Commencez à créer vos sondages",
     "answer": "Répondre",
     "answerDesc": "Entrez un code ou ouvrez le lien reçu",
-    "results": "Voir les résultats",
-    "resultsDesc": "Statistiques et graphiques (admin)",
-    "recentSurveys": "Vos sondages récents",
+    "login": "Se connecter",
+    "loginDesc": "Accédez à votre espace et vos résultats",
     "noAccountRespondent": "Réponse sans compte"
   },
   "auth": {
-    "loginTitle": "Connexion admin",
-    "registerTitle": "Créer un compte admin",
+    "loginTitle": "Connexion",
+    "registerTitle": "Créer un compte",
     "email": "Email",
     "password": "Mot de passe",
     "name": "Nom",
@@ -36,6 +37,63 @@
     "noAccount": "Pas encore de compte ?",
     "hasAccount": "Déjà un compte ?",
     "invalidCredentials": "Email ou mot de passe incorrect"
+  },
+  "dashboard": {
+    "label": "Mon espace",
+    "title": "Tableau de bord",
+    "greeting": "Bonjour, {name}",
+    "subtitle": "Gérez vos sondages, partagez-les et consultez vos résultats.",
+    "newSurvey": "Nouveau sondage",
+    "publishedTitle": "Sondages publiés",
+    "draftsTitle": "Brouillons",
+    "noPublished": "Aucun sondage publié. Créez votre premier sondage.",
+    "draft": "Brouillon",
+    "untitled": "Sans titre",
+    "share": "Partager",
+    "results": "Résultats",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer ce sondage ? Cette action est irréversible.",
+    "responseCount": "{count} réponse(s)",
+    "securityNote": "Seul vous pouvez voir les résultats de vos sondages. Le code sert uniquement à répondre, jamais à consulter les statistiques.",
+    "stats": {
+      "published": "Publiés",
+      "drafts": "Brouillons",
+      "responses": "Réponses"
+    }
+  },
+  "admin": {
+    "title": "Administration plateforme",
+    "subtitle": "Statistiques globales — sans accès au contenu des réponses.",
+    "totalUsers": "Utilisateurs",
+    "newUsersWeek": "Nouveaux (7 j)",
+    "publishedSurveys": "Sondages publiés",
+    "draftSurveys": "Brouillons",
+    "totalResponses": "Réponses totales",
+    "responsesWeek": "Réponses (7 j)",
+    "recentUsers": "Utilisateurs récents",
+    "surveys": "Sondages",
+    "privacyNote": "En tant que superadmin, vous voyez les métriques agrégées et la liste des comptes, mais pas le contenu des réponses individuelles."
+  },
+  "wizard": {
+    "startTitle": "Comment voulez-vous commencer ?",
+    "startSubtitle": "Choisissez un point de départ pour votre sondage.",
+    "blank": "Sondage vierge",
+    "blankDesc": "Partir de zéro avec l'assistant pas à pas",
+    "template": "Template CNAO",
+    "templateDesc": "Enquête coxarthrose pré-remplie (24 questions)",
+    "drafts": "Reprendre un brouillon",
+    "untitledDraft": "Brouillon sans titre",
+    "steps": {
+      "start": "Démarrage",
+      "info": "Étape 1 — Informations",
+      "questions": "Étape 2 — Questions",
+      "preview": "Étape 3 — Aperçu"
+    },
+    "back": "Retour",
+    "continue": "Continuer",
+    "saveDraft": "Enregistrer brouillon",
+    "draftSaved": "Brouillon enregistré."
   },
   "create": {
     "newSurvey": "Nouveau sondage",
@@ -97,13 +155,10 @@
   },
   "results": {
     "title": "Résultats",
-    "enterCode": "Entrez le code du sondage",
-    "load": "Charger les résultats",
     "responses": "{count} réponse reçue",
     "responses_plural": "{count} réponses reçues",
     "noResponses": "Aucune réponse pour l'instant. Partagez le code {code} pour en collecter.",
-    "otherSurvey": "Autre sondage",
-    "quickAccess": "Accès rapide",
+    "backDashboard": "Retour au tableau de bord",
     "viewSimple": "Vue simple",
     "viewChart": "Vue graphique",
     "average": "Moyenne",
@@ -112,9 +167,9 @@
     "exportCsv": "Export CSV",
     "exportPdf": "Export PDF",
     "errors": {
-      "notFound": "Aucun sondage trouvé pour ce code.",
+      "notFound": "Sondage introuvable.",
       "invalid": "Ce sondage est illisible.",
-      "unauthorized": "Accès réservé au créateur du sondage."
+      "unauthorized": "Accès refusé — seul le créateur peut voir ces résultats."
     }
   }
 }

@@ -30,7 +30,7 @@ export function LoginForm() {
       setError(t("invalidCredentials"));
       return;
     }
-    router.push("/");
+    router.push("/dashboard");
     router.refresh();
   };
 
@@ -93,7 +93,7 @@ export function RegisterForm() {
       password: form.get("password"),
       redirect: false,
     });
-    router.push("/");
+    router.push("/dashboard");
     router.refresh();
   };
 

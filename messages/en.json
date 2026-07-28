@@ -9,25 +9,26 @@
     "share": "Share",
     "download": "Download",
     "admin": "Administration",
+    "dashboard": "My space",
+    "superadmin": "Superadmin",
     "logout": "Sign out",
     "login": "Sign in",
     "register": "Create account"
   },
   "home": {
     "title": "Create a survey.\nRead the results.",
-    "subtitle": "Admin account to create and analyze. Respondents join without signing up — share the link or code.",
-    "create": "Create a survey",
-    "createDesc": "Compose your questions and publish",
+    "subtitle": "Sign up to create and analyze your surveys. Respondents join without an account — share the link or code.",
+    "create": "Create account",
+    "createDesc": "Start building your surveys",
     "answer": "Respond",
     "answerDesc": "Enter a code or open the link you received",
-    "results": "View results",
-    "resultsDesc": "Statistics and charts (admin)",
-    "recentSurveys": "Your recent surveys",
+    "login": "Sign in",
+    "loginDesc": "Access your space and your results",
     "noAccountRespondent": "No account required"
   },
   "auth": {
-    "loginTitle": "Admin sign in",
-    "registerTitle": "Create admin account",
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
     "email": "Email",
     "password": "Password",
     "name": "Name",
@@ -36,6 +37,63 @@
     "noAccount": "No account yet?",
     "hasAccount": "Already have an account?",
     "invalidCredentials": "Invalid email or password"
+  },
+  "dashboard": {
+    "label": "My space",
+    "title": "Dashboard",
+    "greeting": "Hello, {name}",
+    "subtitle": "Manage your surveys, share them, and view your results.",
+    "newSurvey": "New survey",
+    "publishedTitle": "Published surveys",
+    "draftsTitle": "Drafts",
+    "noPublished": "No published surveys yet. Create your first one.",
+    "draft": "Draft",
+    "untitled": "Untitled",
+    "share": "Share",
+    "results": "Results",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete this survey? This cannot be undone.",
+    "responseCount": "{count} response(s)",
+    "securityNote": "Only you can see your survey results. The code is for responding only, never for viewing statistics.",
+    "stats": {
+      "published": "Published",
+      "drafts": "Drafts",
+      "responses": "Responses"
+    }
+  },
+  "admin": {
+    "title": "Platform administration",
+    "subtitle": "Global statistics — no access to response content.",
+    "totalUsers": "Users",
+    "newUsersWeek": "New (7d)",
+    "publishedSurveys": "Published surveys",
+    "draftSurveys": "Drafts",
+    "totalResponses": "Total responses",
+    "responsesWeek": "Responses (7d)",
+    "recentUsers": "Recent users",
+    "surveys": "Surveys",
+    "privacyNote": "As superadmin, you see aggregated metrics and account list, but not individual response content."
+  },
+  "wizard": {
+    "startTitle": "How would you like to start?",
+    "startSubtitle": "Pick a starting point for your survey.",
+    "blank": "Blank survey",
+    "blankDesc": "Start from scratch with the step-by-step wizard",
+    "template": "CNAO template",
+    "templateDesc": "Pre-filled coxarthrosis survey (24 questions)",
+    "drafts": "Resume a draft",
+    "untitledDraft": "Untitled draft",
+    "steps": {
+      "start": "Start",
+      "info": "Step 1 — Information",
+      "questions": "Step 2 — Questions",
+      "preview": "Step 3 — Preview"
+    },
+    "back": "Back",
+    "continue": "Continue",
+    "saveDraft": "Save draft",
+    "draftSaved": "Draft saved."
   },
   "create": {
     "newSurvey": "New survey",
@@ -97,13 +155,10 @@
   },
   "results": {
     "title": "Results",
-    "enterCode": "Enter the survey code",
-    "load": "Load results",
     "responses": "{count} response received",
     "responses_plural": "{count} responses received",
     "noResponses": "No responses yet. Share code {code} to collect some.",
-    "otherSurvey": "Another survey",
-    "quickAccess": "Quick access",
+    "backDashboard": "Back to dashboard",
     "viewSimple": "Simple view",
     "viewChart": "Chart view",
     "average": "Average",
@@ -112,9 +167,9 @@
     "exportCsv": "Export CSV",
     "exportPdf": "Export PDF",
     "errors": {
-      "notFound": "No survey found for this code.",
+      "notFound": "Survey not found.",
       "invalid": "This survey could not be read.",
-      "unauthorized": "Access restricted to the survey creator."
+      "unauthorized": "Access denied — only the creator can view these results."
     }
   }
 }

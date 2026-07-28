@@ -1,3 +1,4 @@
+import { SurveyStatus } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Question } from "@/lib/constants";
@@ -8,8 +9,8 @@ async function getAuthorizedSurvey(code: string) {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const survey = await prisma.survey.findUnique({
-    where: { code: code.toUpperCase() },
+  const survey = await prisma.survey.findFirst({
+    where: { code: code.toUpperCase(), status: SurveyStatus.PUBLISHED },
     include: { responses: { orderBy: { submittedAt: "asc" } } },
   });
 

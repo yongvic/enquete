@@ -1,21 +1,24 @@
 import { Header } from "@/components/Header";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
-import { getMySurveys } from "@/lib/actions/survey";
-import { Plus, ClipboardList, BarChart3 } from "lucide-react";
+import { ClipboardList, Plus, LayoutDashboard } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { OCHRE, SLATE, INK } from "@/lib/constants";
+import { INK, OCHRE, SLATE } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
   const session = await auth();
-  const mySurveys = session?.user?.id ? await getMySurveys() : [];
+
+  if (session?.user?.id) {
+    redirect(`/${locale}/dashboard`);
+  }
 
   return (
     <>
-      <Header isAdmin={!!session?.user?.id} />
+      <Header />
       <div className="px-5 sm:px-8 pb-10 pt-2 max-w-2xl mx-auto">
         <div className="pt-6">
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight whitespace-pre-line" style={{ letterSpacing: "-0.01em" }}>
@@ -27,43 +30,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
           <div className="grid sm:grid-cols-2 gap-3 mt-8">
             <HomeLinkCard
-              href={session?.user?.id ? "/creer" : "/connexion"}
+              href="/inscription"
               icon={<Plus size={20} />}
               title={t("create")}
               desc={t("createDesc")}
             />
-            <HomeLinkCard href="/repondre" icon={<ClipboardList size={20} />} title={t("answer")} desc={t("answerDesc")} />
             <HomeLinkCard
-              href={session?.user?.id ? "/resultats" : "/connexion"}
-              icon={<BarChart3 size={20} />}
-              title={t("results")}
-              desc={t("resultsDesc")}
+              href="/repondre"
+              icon={<ClipboardList size={20} />}
+              title={t("answer")}
+              desc={t("answerDesc")}
+            />
+            <HomeLinkCard
+              href="/connexion"
+              icon={<LayoutDashboard size={20} />}
+              title={t("login")}
+              desc={t("loginDesc")}
               full
             />
           </div>
-
-          {mySurveys.length > 0 && (
-            <div className="mt-10">
-              <div className="sondage-mono text-xs tracking-widest uppercase mb-3" style={{ color: SLATE }}>
-                {t("recentSurveys")}
-              </div>
-              <div className="flex flex-col gap-2">
-                {mySurveys.map((s) => (
-                  <Link
-                    key={s.id}
-                    href={`/publie/${s.code}`}
-                    className="sondage-btn sondage-option flex items-center justify-between py-2.5 px-3 text-left"
-                    style={{ border: `1px solid ${SLATE}55`, background: "transparent" }}
-                  >
-                    <span className="sondage-sans text-sm truncate pr-3">{s.title || "Sans titre"}</span>
-                    <span className="sondage-mono text-xs tracking-widest" style={{ color: OCHRE }}>
-                      {s.code}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
 
           <p className="sondage-mono text-[11px] tracking-widest uppercase mt-10 text-center" style={{ color: SLATE }}>
             {t("noAccountRespondent")}

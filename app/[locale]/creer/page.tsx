@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
-import { CreateSurveyForm } from "@/components/CreateSurveyForm";
+import { SurveyWizard } from "@/components/SurveyWizard";
+import { getDraft, getMyDrafts } from "@/lib/actions/survey";
 import { requireAuth } from "@/lib/session";
 import { setRequestLocale } from "next-intl/server";
 
@@ -8,18 +9,21 @@ export default async function CreatePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ blank?: string }>;
+  searchParams: Promise<{ draft?: string }>;
 }) {
   const { locale } = await params;
-  const { blank } = await searchParams;
+  const { draft: draftId } = await searchParams;
   setRequestLocale(locale);
-  await requireAuth(locale);
+  const session = await requireAuth(locale);
+
+  const drafts = await getMyDrafts();
+  const initialDraft = draftId ? await getDraft(draftId) : null;
 
   return (
     <>
-      <Header isAdmin />
+      <Header isLoggedIn role={session.user.role} />
       <div className="px-5 sm:px-8 pb-10 pt-2 max-w-2xl mx-auto">
-        <CreateSurveyForm useTemplate={blank !== "1"} />
+        <SurveyWizard drafts={drafts} initialDraft={initialDraft} />
       </div>
     </>
   );

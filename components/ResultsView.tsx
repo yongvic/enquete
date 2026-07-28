@@ -12,100 +12,55 @@ import { ResultsChart } from "./ResultsChart";
 type ViewMode = "simple" | "chart";
 
 interface ResultsViewProps {
-  initialCode?: string;
-  mySurveys?: { id: string; code: string; title: string; createdAt: Date }[];
+  initialCode: string;
 }
 
-export function ResultsView({ initialCode = "", mySurveys = [] }: ResultsViewProps) {
+export function ResultsView({ initialCode }: ResultsViewProps) {
   const t = useTranslations("results");
-  const [code, setCode] = useState(initialCode);
   const [survey, setSurvey] = useState<SurveyData | null>(null);
   const [responses, setResponses] = useState<SurveyResponse[] | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("chart");
 
-  const load = async (forcedCode?: string) => {
-    const c = (forcedCode || code).trim().toUpperCase();
-    if (!c) return;
-    setLoading(true);
-    setError("");
-    setSurvey(null);
-    setResponses(null);
-    const result = await getSurveyResults(c);
-    setLoading(false);
-    if (result.error === "unauthorized" || result.error === "forbidden") {
-      setError(t("errors.unauthorized"));
-      return;
-    }
-    if (result.error === "notFound") {
-      setError(t("errors.notFound"));
-      return;
-    }
-    if (!result.survey) return;
-    setSurvey(result.survey);
-    setResponses(result.responses);
-    setCode(c);
-  };
-
   useEffect(() => {
-    if (initialCode) load(initialCode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialCode]);
+    (async () => {
+      setLoading(true);
+      setError("");
+      const result = await getSurveyResults(initialCode);
+      setLoading(false);
+      if (result.error === "unauthorized" || result.error === "forbidden") {
+        setError(t("errors.unauthorized"));
+        return;
+      }
+      if (result.error === "notFound") {
+        setError(t("errors.notFound"));
+        return;
+      }
+      if (!result.survey) return;
+      setSurvey(result.survey);
+      setResponses(result.responses);
+    })();
+  }, [initialCode, t]);
 
-  if (!survey || !responses) {
+  if (loading) {
     return (
-      <div className="pt-6">
-        <div className="sondage-mono text-xs tracking-widest uppercase mb-2" style={{ color: SLATE }}>
-          {t("title")}
-        </div>
-        <h1 className="text-2xl font-bold">{t("enterCode")}</h1>
-        <div className="flex gap-2 mt-5">
-          <input
-            className="sondage-input sondage-mono text-xl tracking-widest text-center"
-            placeholder="ABCDE"
-            maxLength={8}
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            onKeyDown={(e) => e.key === "Enter" && load()}
-          />
-        </div>
-        <button
-          onClick={() => load()}
-          disabled={loading}
-          className="sondage-btn sondage-sans w-full mt-4 py-3 text-sm text-white flex items-center justify-center gap-2"
-          style={{ background: INK, opacity: loading ? 0.7 : 1 }}
-        >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : t("load")}
-        </button>
-        {error && (
-          <div className="sondage-sans text-sm mt-4 flex items-center gap-2" style={{ color: RUST }}>
-            <AlertCircle size={15} /> {error}
-          </div>
-        )}
+      <div className="pt-16 flex justify-center">
+        <Loader2 size={24} className="animate-spin" style={{ color: SLATE }} />
+      </div>
+    );
+  }
 
-        {mySurveys.length > 0 && (
-          <div className="mt-8">
-            <div className="sondage-mono text-xs tracking-widest uppercase mb-3" style={{ color: SLATE }}>
-              {t("quickAccess")}
-            </div>
-            <div className="flex flex-col gap-2">
-              {mySurveys.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => load(s.code)}
-                  className="sondage-btn sondage-option flex items-center justify-between py-2.5 px-3 text-left"
-                  style={{ border: `1px solid ${SLATE}55` }}
-                >
-                  <span className="sondage-sans text-sm truncate pr-3">{s.title || "Sans titre"}</span>
-                  <span className="sondage-mono text-xs tracking-widest" style={{ color: "#C9971C" }}>
-                    {s.code}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+  if (error || !survey || !responses) {
+    return (
+      <div className="pt-10 text-center">
+        <AlertCircle size={24} style={{ color: RUST }} className="mx-auto" />
+        <p className="sondage-sans text-sm mt-4" style={{ color: RUST }}>
+          {error || t("errors.notFound")}
+        </p>
+        <Link href="/dashboard" className="sondage-btn sondage-sans inline-block mt-6 py-2.5 px-6 text-sm text-white" style={{ background: INK }}>
+          {t("backDashboard")}
+        </Link>
       </div>
     );
   }
@@ -119,7 +74,9 @@ export function ResultsView({ initialCode = "", mySurveys = [] }: ResultsViewPro
           </div>
           <h1 className="text-2xl font-bold">{survey.title}</h1>
           <p className="sondage-sans text-sm mt-1" style={{ color: `${INK}99` }}>
-            {responses.length === 1 ? t("responses", { count: responses.length }) : t("responses_plural", { count: responses.length })}
+            {responses.length === 1
+              ? t("responses", { count: responses.length })
+              : t("responses_plural", { count: responses.length })}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -179,16 +136,13 @@ export function ResultsView({ initialCode = "", mySurveys = [] }: ResultsViewPro
         </div>
       )}
 
-      <button
-        onClick={() => {
-          setSurvey(null);
-          setResponses(null);
-        }}
-        className="sondage-btn sondage-sans mt-10 text-sm flex items-center gap-1.5"
+      <Link
+        href="/dashboard"
+        className="sondage-btn sondage-sans mt-10 text-sm flex items-center gap-1.5 inline-flex"
         style={{ color: SLATE }}
       >
-        <ArrowLeft size={14} /> {t("otherSurvey")}
-      </button>
+        <ArrowLeft size={14} /> {t("backDashboard")}
+      </Link>
     </div>
   );
 }
