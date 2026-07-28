@@ -120,6 +120,10 @@
     "max": "max",
     "unit": "unité",
     "unitPlaceholder": "ans, /10…",
+    "required": "Importante",
+    "optional": "Optionnelle",
+    "requiredHint": "Réponse obligatoire pour les répondants",
+    "optionalHint": "Réponse facultative",
     "errors": {
       "title": "Donnez un titre à votre sondage.",
       "questions": "Ajoutez au moins une question.",
@@ -147,11 +151,18 @@
     "thanksDesc": "Votre réponse a été enregistrée.",
     "backHome": "Retour à l'accueil",
     "placeholder": "Votre réponse…",
+    "required": "Importante",
+    "optional": "Optionnelle",
     "errors": {
       "notFound": "Aucun sondage trouvé pour ce code.",
       "invalid": "Ce sondage est illisible.",
-      "submit": "Échec de l'envoi. Réessayez."
+      "submit": "Échec de l'envoi. Réessayez.",
+      "required": "{count, plural, one {# question importante reste sans réponse.} other {# questions importantes restent sans réponse.}}"
     }
+  },
+  "footer": {
+    "madeBy": "Plateforme conçue par",
+    "tagline": "Sondages · CNAO · Open source"
   },
   "results": {
     "title": "Résultats",

@@ -54,6 +54,7 @@ const questionSchema = z.object({
   min: z.number().optional(),
   max: z.number().optional(),
   unit: z.string().optional(),
+  required: z.boolean().optional(),
 });
 
 const surveyInputSchema = z.object({

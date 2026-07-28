@@ -120,6 +120,10 @@
     "max": "max",
     "unit": "unit",
     "unitPlaceholder": "years, /10…",
+    "required": "Required",
+    "optional": "Optional",
+    "requiredHint": "Respondents must answer this question",
+    "optionalHint": "Answer is optional",
     "errors": {
       "title": "Please give your survey a title.",
       "questions": "Add at least one question.",
@@ -147,11 +151,18 @@
     "thanksDesc": "Your response has been recorded.",
     "backHome": "Back to home",
     "placeholder": "Your answer…",
+    "required": "Required",
+    "optional": "Optional",
     "errors": {
       "notFound": "No survey found for this code.",
       "invalid": "This survey could not be read.",
-      "submit": "Submission failed. Please try again."
+      "submit": "Submission failed. Please try again.",
+      "required": "{count, plural, one {# required question is unanswered.} other {# required questions are unanswered.}}"
     }
+  },
+  "footer": {
+    "madeBy": "Platform built by",
+    "tagline": "Surveys · CNAO · Open source"
   },
   "results": {
     "title": "Results",

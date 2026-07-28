@@ -1,5 +1,15 @@
 import { Question, uuid } from "@/lib/constants";
 
+const req = [
+  "Âge",
+  "Sexe",
+  "Ancienneté de la coxarthrose",
+  "Hanche atteinte",
+  "Douleur avant appareillage (EVA)",
+  "Douleur après appareillage (EVA)",
+  "Satisfaction",
+];
+
 export const ENQUETE_TEMPLATE = {
   title: "Impact de la prise en charge par appareillage orthopédique des patients atteints de coxarthrose",
   description: "CNAO – Centre National d'Appareillage Orthopédique, Lomé",
@@ -28,5 +38,9 @@ export const ENQUETE_TEMPLATE = {
     { type: "single" as const, text: "Recommanderiez-vous l'appareillage ?", options: ["Oui", "Non"] },
     { type: "single" as const, text: "Qualité de vie", options: ["Beaucoup améliorée", "Améliorée", "Inchangée", "Dégradée"] },
     { type: "text" as const, text: "Difficultés rencontrées" },
-  ].map((q) => ({ id: uuid(), ...q })) as Question[],
+  ].map((q) => ({
+    id: uuid(),
+    ...q,
+    required: req.includes(q.text),
+  })) as Question[],
 };

@@ -19,7 +19,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Header />
-      <div className="px-5 sm:px-8 pb-10 pt-2 max-w-2xl mx-auto">
+      <div className="sondage-page">
         <div className="pt-6">
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight whitespace-pre-line" style={{ letterSpacing: "-0.01em" }}>
             {t("title")}

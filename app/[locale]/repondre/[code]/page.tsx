@@ -13,7 +13,7 @@ export default async function AnswerByCodePage({
   return (
     <>
       <Header />
-      <div className="px-5 sm:px-8 pb-10 pt-2 max-w-2xl mx-auto">
+      <div className="sondage-page">
         <AnswerSurveyForm initialCode={code} />
       </div>
     </>

@@ -12,6 +12,7 @@ export interface Question {
   id: string;
   type: QuestionType;
   text: string;
+  required?: boolean;
   options?: string[];
   min?: number;
   max?: number;

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Send, Loader2, AlertCircle } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { getMissingRequiredQuestions, isQuestionRequired } from "@/lib/answers";
 import { getSurveyByCode, submitResponse } from "@/lib/actions/survey";
 import { GREEN, INK, RUST, SLATE, Question, SurveyData } from "@/lib/constants";
 
@@ -20,6 +21,7 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
   const [answers, setAnswers] = useState<Record<string, string | number | string[] | undefined>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [missingIds, setMissingIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (initialCode) load(initialCode);
@@ -59,6 +61,13 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
 
   const submit = async () => {
     if (!survey) return;
+    const missing = getMissingRequiredQuestions(survey.questions, answers);
+    if (missing.length > 0) {
+      setMissingIds(missing.map((q) => q.id));
+      setError(t("errors.required", { count: missing.length }));
+      return;
+    }
+    setMissingIds([]);
     setSubmitting(true);
     setError("");
     const result = await submitResponse(survey.code, answers);
@@ -137,12 +146,26 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
 
       <div className="flex flex-col gap-7 mt-7">
         {survey.questions.map((q, i) => (
-          <div key={q.id}>
-            <div className="sondage-sans font-semibold text-[15px]">
+          <div
+            key={q.id}
+            id={`q-${q.id}`}
+            className="scroll-mt-4"
+            style={
+              missingIds.includes(q.id)
+                ? { borderLeft: `3px solid ${RUST}`, paddingLeft: 12, marginLeft: -12 }
+                : undefined
+            }
+          >
+            <div className="sondage-sans font-semibold text-[15px] leading-snug">
               <span className="sondage-mono text-xs mr-2" style={{ color: SLATE }}>
                 Q{i + 1}
               </span>
               {q.text}
+              {isQuestionRequired(q) ? (
+                <span className="sondage-required-badge sondage-required-badge--yes">{t("required")}</span>
+              ) : (
+                <span className="sondage-required-badge sondage-required-badge--no">{t("optional")}</span>
+              )}
             </div>
             <div className="mt-3">
               {q.type === "single" &&
@@ -164,12 +187,12 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
                   </label>
                 ))}
               {q.type === "rating" && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       key={n}
                       onClick={() => setAnswer(q.id, n)}
-                      className="sondage-btn sondage-mono w-10 h-10 text-sm"
+                      className="sondage-btn sondage-mono w-11 h-11 sm:w-10 sm:h-10 text-sm"
                       style={{
                         border: `1px solid ${INK}`,
                         background: answers[q.id] === n ? INK : "transparent",
@@ -187,8 +210,8 @@ export function AnswerSurveyForm({ initialCode = "" }: AnswerSurveyFormProps) {
                     type="number"
                     min={q.min}
                     max={q.max}
-                    className="sondage-input sondage-mono text-sm"
-                    style={{ width: 100 }}
+                    className="sondage-input sondage-mono text-sm max-w-[140px]"
+                    style={{ width: "100%" }}
                     placeholder="0"
                     value={answers[q.id] ?? ""}
                     onChange={(e) =>

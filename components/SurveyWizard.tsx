@@ -13,6 +13,7 @@ import {
   FileText,
   ClipboardList,
   Save,
+  Asterisk,
 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { publishSurvey, saveDraft } from "@/lib/actions/survey";
@@ -22,7 +23,7 @@ import { ENQUETE_TEMPLATE } from "@/lib/templates/enquete";
 const QUESTION_TYPES: QuestionType[] = ["single", "multi", "rating", "number", "text"];
 
 function emptyQuestion(): Question {
-  return { id: uuid(), type: "single", text: "", options: ["", ""] };
+  return { id: uuid(), type: "single", text: "", options: ["", ""], required: false };
 }
 
 type WizardStep = "start" | "info" | "questions" | "preview";
@@ -272,10 +273,12 @@ export function SurveyWizard({ drafts = [], initialDraft = null }: SurveyWizardP
                 <span className="sondage-mono text-xs mr-2" style={{ color: SLATE }}>
                   Q{i + 1}
                 </span>
-                {q.text}
-                <span className="sondage-mono text-xs ml-2" style={{ color: SLATE }}>
-                  ({tc(`types.${q.type}`)})
-                </span>
+              {q.text}
+              {q.required ? (
+                <span className="sondage-required-badge sondage-required-badge--yes">{tc("required")}</span>
+              ) : (
+                <span className="sondage-required-badge sondage-required-badge--no">{tc("optional")}</span>
+              )}
               </div>
             ))}
           </div>
@@ -395,7 +398,7 @@ function QuestionEditor({
           </button>
         )}
       </div>
-      <div className="flex gap-2 mt-3 flex-wrap">
+      <div className="flex gap-2 mt-3 flex-wrap items-center">
         {QUESTION_TYPES.map((type) => (
           <button
             key={type}
@@ -415,6 +418,20 @@ function QuestionEditor({
             {tc(`types.${type}`)}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => onChange({ required: !q.required })}
+          className="sondage-btn sondage-sans text-xs px-2.5 py-1.5 flex items-center gap-1 ml-auto sm:ml-0"
+          style={{
+            border: `1px solid ${q.required ? RUST : SLATE + "66"}`,
+            background: q.required ? `${RUST}12` : "transparent",
+            color: q.required ? RUST : SLATE,
+          }}
+          title={q.required ? tc("requiredHint") : tc("optionalHint")}
+        >
+          <Asterisk size={12} />
+          {q.required ? tc("required") : tc("optional")}
+        </button>
       </div>
       {(q.type === "single" || q.type === "multi") && (
         <div className="mt-3 flex flex-col gap-2">

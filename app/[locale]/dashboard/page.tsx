@@ -14,7 +14,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   return (
     <>
       <Header isLoggedIn role={session.user.role} />
-      <div className="px-5 sm:px-8 pb-10 pt-2 max-w-3xl mx-auto">
+      <div className="sondage-page max-w-3xl">
         <UserDashboard
           published={published}
           drafts={drafts}

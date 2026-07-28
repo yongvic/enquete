@@ -2,6 +2,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { AppShell } from "@/components/AppShell";
 import { Providers } from "@/components/Providers";
 import "../globals.css";
 
@@ -27,9 +28,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <Providers>
-            <div className="w-full min-h-screen rounded-sm" style={{ background: "#F7F5EF", color: "#1E2A38" }}>
-              {children}
-            </div>
+            <AppShell>{children}</AppShell>
           </Providers>
         </NextIntlClientProvider>
       </body>
