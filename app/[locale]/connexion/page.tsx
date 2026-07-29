@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { AuthShell } from "@/components/AuthShell";
 import { LoginForm } from "@/components/AuthForms";
 import { setRequestLocale } from "next-intl/server";
 
@@ -7,11 +7,8 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
 
   return (
-    <>
-      <Header />
-      <div className="sondage-page">
-        <LoginForm />
-      </div>
-    </>
+    <AuthShell mode="login">
+      <LoginForm />
+    </AuthShell>
   );
 }

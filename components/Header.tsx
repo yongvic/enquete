@@ -1,10 +1,11 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, LayoutDashboard, Shield } from "lucide-react";
+import { LayoutDashboard, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { INK, SLATE, OCHRE } from "@/lib/constants";
+import { SLATE, OCHRE } from "@/lib/constants";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { BrandLogo } from "./BrandLogo";
 import { signOut } from "next-auth/react";
 import { isSuperAdmin } from "@/lib/roles";
 import { Role } from "@prisma/client";
@@ -18,18 +19,9 @@ export function Header({ isLoggedIn, role }: HeaderProps) {
   const t = useTranslations("common");
 
   return (
-    <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-3 sm:pb-4 sticky top-0 z-20" style={{ borderBottom: `1px solid ${SLATE}44`, background: "#F7F5EF" }}>
-      <div className="flex items-center justify-between max-w-3xl mx-auto gap-2 sm:gap-3">
-        <Link
-          href={isLoggedIn ? "/dashboard" : "/"}
-          className="sondage-btn sondage-sans flex items-center gap-1.5 text-sm min-h-0 py-1"
-          style={{ color: INK }}
-        >
-          <ArrowLeft size={15} className="shrink-0" />
-          <span className="sondage-mono text-xs tracking-widest uppercase truncate max-w-[120px] sm:max-w-none">
-            {t("appName")}
-          </span>
-        </Link>
+    <div className="app-header px-4 sm:px-8 pt-4 sm:pt-5 pb-3 sm:pb-4 sticky top-0 z-20">
+      <div className="flex items-center justify-between max-w-5xl mx-auto gap-2 sm:gap-3">
+        <BrandLogo variant={isLoggedIn ? "icon" : "full"} href={isLoggedIn ? "/dashboard" : "/"} />
 
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {isLoggedIn && (
@@ -72,8 +64,8 @@ export function Header({ isLoggedIn, role }: HeaderProps) {
           ) : (
             <Link
               href="/connexion"
-              className="sondage-mono text-[10px] sm:text-[11px] tracking-widest uppercase px-1 min-h-[40px] flex items-center"
-              style={{ color: SLATE }}
+              className="sondage-sans text-xs sm:text-sm font-semibold px-3 py-2 min-h-[40px] flex items-center"
+              style={{ color: OCHRE }}
             >
               {t("login")}
             </Link>
