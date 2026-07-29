@@ -30,6 +30,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   surveys       Survey[]
+  aiReports     AiReport[]
 }
 
 model Account {
@@ -78,6 +79,7 @@ model Survey {
   userId      String
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   responses   Response[]
+  aiReports   AiReport[]
 
   @@index([userId])
   @@index([code])
@@ -104,4 +106,18 @@ model Feedback {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+model AiReport {
+  id        String   @id @default(cuid())
+  surveyId  String
+  survey    Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  locale    String   @default("fr")
+  createdAt DateTime @default(now())
+
+  @@index([surveyId, createdAt])
+  @@index([userId, createdAt])
 }

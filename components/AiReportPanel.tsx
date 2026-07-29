@@ -1,9 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Sparkles, Loader2, AlertCircle, Download, Copy, Check } from "lucide-react";
 import { INK, OCHRE, RUST, SLATE } from "@/lib/constants";
+
+interface SavedReport {
+  id: string;
+  content: string;
+  locale: string;
+  createdAt: string;
+}
+
+interface QuotaInfo {
+  unlimited: boolean;
+  limit: number | null;
+  usedToday: number;
+  remaining: number | null;
+}
 
 interface AiReportPanelProps {
   surveyCode: string;
@@ -13,10 +27,41 @@ interface AiReportPanelProps {
 export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps) {
   const t = useTranslations("results.aiReport");
   const locale = useLocale();
+  const [reports, setReports] = useState<SavedReport[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [report, setReport] = useState<string | null>(null);
+  const [quota, setQuota] = useState<QuotaInfo | null>(null);
   const [loading, setLoading] = useState(false);
+  const [bootLoading, setBootLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setBootLoading(true);
+      try {
+        const res = await fetch(`/api/report/ai/${surveyCode}`);
+        const data = await res.json();
+        if (cancelled || !res.ok) return;
+        setReports(data.reports || []);
+        setQuota(data.quota || null);
+        if (data.reports?.length) {
+          setActiveId(data.reports[0].id);
+          setReport(data.reports[0].content);
+        }
+      } catch {
+        // ignore bootstrap errors
+      } finally {
+        if (!cancelled) setBootLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [surveyCode]);
+
+  const canGenerate = quota?.unlimited || (quota?.remaining ?? 1) > 0;
 
   const generate = async () => {
     setLoading(true);
@@ -30,14 +75,27 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
       const data = await res.json();
       if (!res.ok) {
         setError(t(`errors.${data.error as string}`) || t("errors.generationFailed"));
+        if (data.error === "dailyLimit" && quota && !quota.unlimited) {
+          setQuota({ ...quota, remaining: 0, usedToday: quota.limit ?? quota.usedToday });
+        }
         return;
       }
       setReport(data.report);
+      setActiveId(data.reportId);
+      setReports(data.reports || []);
+      setQuota(data.quota || null);
     } catch {
       setError(t("errors.generationFailed"));
     } finally {
       setLoading(false);
     }
+  };
+
+  const selectReport = (id: string) => {
+    const found = reports.find((r) => r.id === id);
+    if (!found) return;
+    setActiveId(id);
+    setReport(found.content);
   };
 
   const copyReport = async () => {
@@ -77,12 +135,22 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
           <p className="sondage-sans text-sm mt-2" style={{ color: `${INK}99` }}>
             {t("subtitle")}
           </p>
+          {quota && (
+            <p className="sondage-sans text-xs mt-2" style={{ color: SLATE }}>
+              {quota.unlimited
+                ? t("quotaUnlimited")
+                : t("quotaRemaining", { remaining: quota.remaining ?? 0, limit: quota.limit ?? 2 })}
+            </p>
+          )}
+          <p className="sondage-sans text-[11px] mt-1" style={{ color: SLATE }}>
+            {t("storageHint")}
+          </p>
         </div>
         <button
           onClick={generate}
-          disabled={loading}
+          disabled={loading || bootLoading || !canGenerate}
           className="sondage-btn sondage-sans text-xs px-4 py-2.5 flex items-center gap-2 text-white shrink-0"
-          style={{ background: INK, opacity: loading ? 0.7 : 1 }}
+          style={{ background: INK, opacity: loading || !canGenerate ? 0.65 : 1 }}
         >
           {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {loading ? t("generating") : report ? t("regenerate") : t("generate")}
@@ -92,6 +160,31 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
       {error && (
         <div className="sondage-sans text-sm mt-4 flex items-center gap-2" style={{ color: RUST }}>
           <AlertCircle size={15} /> {error}
+        </div>
+      )}
+
+      {bootLoading && (
+        <div className="mt-4 flex items-center gap-2 sondage-sans text-sm" style={{ color: SLATE }}>
+          <Loader2 size={14} className="animate-spin" /> {t("loadingSaved")}
+        </div>
+      )}
+
+      {reports.length > 1 && (
+        <div className="mt-4">
+          <label className="sondage-sans text-xs font-medium" style={{ color: SLATE }}>
+            {t("history")}
+          </label>
+          <select
+            className="auth-input mt-1.5 sondage-sans text-sm"
+            value={activeId || ""}
+            onChange={(e) => selectReport(e.target.value)}
+          >
+            {reports.map((r) => (
+              <option key={r.id} value={r.id}>
+                {new Date(r.createdAt).toLocaleString(locale)}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
@@ -115,8 +208,8 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
             </button>
           </div>
           <div
-            className="sondage-sans text-sm leading-relaxed p-4 whitespace-pre-wrap"
-            style={{ border: `1px solid ${SLATE}44`, background: "#F7F5EF" }}
+            className="ai-report-body sondage-sans text-sm leading-relaxed p-4 sm:p-5"
+            style={{ border: `1px solid ${SLATE}44`, background: "#fff" }}
           >
             <AiReportContent report={report} />
           </div>
@@ -130,27 +223,106 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
 }
 
 function AiReportContent({ report }: { report: string }) {
-  const parts = report.split(/(?=^## )/m);
+  const blocks = report
+    .replace(/\r\n/g, "\n")
+    .split(/\n(?=##\s)/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+
   return (
-    <div className="flex flex-col gap-4">
-      {parts.map((part, i) => {
-        const trimmed = part.trim();
-        if (!trimmed) return null;
-        if (trimmed.startsWith("## ")) {
-          const [heading, ...rest] = trimmed.split("\n");
+    <div className="flex flex-col gap-5">
+      {blocks.map((block, i) => {
+        if (block.startsWith("## ")) {
+          const lines = block.split("\n");
+          const heading = lines[0].replace(/^##\s*/, "").trim();
+          const body = lines.slice(1).join("\n").trim();
           return (
-            <div key={i}>
-              <h3 className="font-bold text-[15px] mb-2">{heading.replace(/^##\s*/, "")}</h3>
-              <div style={{ color: `${INK}dd` }}>{rest.join("\n").trim()}</div>
-            </div>
+            <section key={i}>
+              <h3 className="font-bold text-[15px] mb-2.5 tracking-tight" style={{ color: INK }}>
+                {heading}
+              </h3>
+              <MarkdownBody text={body} />
+            </section>
           );
         }
-        return (
-          <div key={i} style={{ color: `${INK}dd` }}>
-            {trimmed}
-          </div>
-        );
+        return <MarkdownBody key={i} text={block} />;
       })}
     </div>
   );
+}
+
+function MarkdownBody({ text }: { text: string }) {
+  if (!text) return null;
+  const lines = text.split("\n");
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    elements.push(
+      <ul key={`ul-${elements.length}`} className="flex flex-col gap-1.5 my-1 pl-0 list-none">
+        {listItems.map((item, idx) => (
+          <li key={idx} className="flex gap-2.5 items-start">
+            <span className="mt-[0.45em] w-1.5 h-1.5 rounded-full shrink-0" style={{ background: OCHRE }} />
+            <span style={{ color: `${INK}ee` }}>{formatInline(item)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    listItems = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const bullet = line.match(/^[-*•]\s+(.+)$/) || line.match(/^\d+\.\s+(.+)$/);
+    if (bullet) {
+      listItems.push(bullet[1]);
+      continue;
+    }
+    flushList();
+    if (!line.trim()) {
+      elements.push(<div key={`sp-${elements.length}`} className="h-2" />);
+      continue;
+    }
+    elements.push(
+      <p key={`p-${elements.length}`} className="mb-1.5 last:mb-0" style={{ color: `${INK}ee` }}>
+        {formatInline(line.trim())}
+      </p>
+    );
+  }
+  flushList();
+
+  return <div className="flex flex-col gap-0.5">{elements}</div>;
+}
+
+function formatInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-semibold">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <em key={i} className="italic">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return (
+        <code
+          key={i}
+          className="sondage-mono text-[12px] px-1 py-0.5 rounded-sm"
+          style={{ background: `${SLATE}22` }}
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
 }

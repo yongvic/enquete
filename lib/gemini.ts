@@ -68,7 +68,8 @@ function extractText(body: {
 
 export async function generateWithGeminiFallback(
   prompt: string,
-  systemInstruction: string
+  systemInstruction: string,
+  options?: { maxOutputTokens?: number; temperature?: number }
 ): Promise<GeminiGenerateResult> {
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
@@ -77,6 +78,8 @@ export async function generateWithGeminiFallback(
 
   const models = getGeminiModels();
   const errors: string[] = [];
+  const maxOutputTokens = options?.maxOutputTokens ?? 8192;
+  const temperature = options?.temperature ?? 0.35;
 
   for (const model of models) {
     const url = `${GEMINI_API_BASE}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -92,8 +95,8 @@ export async function generateWithGeminiFallback(
           systemInstruction: { parts: [{ text: systemInstruction }] },
           contents: [{ role: "user", parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens: 8192,
+            temperature,
+            maxOutputTokens,
           },
         }),
       });

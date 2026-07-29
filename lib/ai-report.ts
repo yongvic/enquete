@@ -5,6 +5,7 @@ import {
 } from "@/lib/export-report";
 import { computeQuestionStats } from "@/lib/stats";
 import { generateWithGeminiFallback } from "@/lib/gemini";
+import { prisma } from "@/lib/prisma";
 
 export interface AiReportDataset {
   title: string;
@@ -89,13 +90,15 @@ export function buildAiReportDataset(
     };
   });
 
-  const crosstabs = getPairwiseCrosstabs(questions, responses).map((p) => ({
-    questionA: p.questionA,
-    questionB: p.questionB,
-    rows: p.rows,
-    cols: p.cols,
-    matrix: p.matrix,
-  }));
+  const crosstabs = getPairwiseCrosstabs(questions, responses)
+    .slice(0, 4)
+    .map((p) => ({
+      questionA: p.questionA,
+      questionB: p.questionB,
+      rows: p.rows,
+      cols: p.cols,
+      matrix: p.matrix,
+    }));
 
   return {
     title: survey.title,
@@ -110,47 +113,53 @@ export function buildAiReportDataset(
 
 function systemInstruction(locale: string): string {
   if (locale === "en") {
-    return `You are a research assistant specializing in survey data analysis for academic work (theses, dissertations, medical enquiries).
-Write clear, professional reports in English based ONLY on the aggregated statistics provided.
-Never invent numbers. If data is insufficient, say so explicitly.
-Use Markdown with these sections: ## Executive summary, ## Key findings, ## Cross-tabulation insights, ## Methodological limitations, ## Recommendations for further analysis.
-Tone: academic but accessible.`;
+    return `You are a concise research assistant for academic surveys.
+Write SHORT reports in English based ONLY on the aggregated statistics provided.
+Never invent numbers. Do not ramble. Prefer bullets over long paragraphs.
+Hard limit: about 250–350 words total.
+Use exactly this Markdown structure:
+## Synthesis
+## Key findings
+## Limits
+Tone: clear, academic, direct.`;
   }
 
-  return `Tu es un assistant de recherche spécialisé dans l'analyse de sondages pour travaux universitaires (mémoires, thèses, enquêtes médicales).
-Rédige des rapports clairs et professionnels en français à partir UNIQUEMENT des statistiques agrégées fournies.
-N'invente jamais de chiffres. Si les données sont insuffisantes, indique-le explicitement.
-Utilise le Markdown avec ces sections : ## Synthèse exécutive, ## Principaux résultats, ## Analyse des tableaux croisés, ## Limites méthodologiques, ## Pistes d'analyse complémentaire.
-Ton : académique mais accessible.`;
+  return `Tu es un assistant de recherche concis pour sondages académiques.
+Rédige des rapports COURTS en français à partir UNIQUEMENT des statistiques agrégées fournies.
+N'invente jamais de chiffres. Ne sois pas verbeux. Préfère les puces aux longs paragraphes.
+Limite dure : environ 250–350 mots au total.
+Utilise exactement cette structure Markdown :
+## Synthèse
+## Points clés
+## Limites
+Ton : clair, académique, direct.`;
 }
 
 function buildPrompt(dataset: AiReportDataset, locale: string): string {
   const payload = JSON.stringify(dataset, null, 2);
   if (locale === "en") {
-    return `Analyze the following survey results and produce a structured analytical report.
+    return `Produce a short global synthesis of these survey results.
 
-Survey metadata and aggregated statistics (JSON):
+JSON data:
 ${payload}
 
 Rules:
-- Cite percentages and counts exactly as given.
-- For text questions, only the response count is available — do not speculate on content.
-- Mention sample size (${dataset.responseCount} responses) in the executive summary.
-- Highlight the most salient patterns and any notable cross-tabulations.
-- End with a short disclaimer that this report is AI-generated and must be verified.`;
+- Start with sample size (${dataset.responseCount} responses) in ## Synthesis (4–6 sentences max).
+- ## Key findings: 4–6 bullets with exact counts/percentages. Only the strongest patterns.
+- ## Limits: 2–3 short bullets (sample size, self-report bias, AI-generated caveat).
+- No other sections. No fluff. No repeating the same idea.`;
   }
 
-  return `Analyse les résultats de sondage suivants et produis un rapport analytique structuré.
+  return `Produis une synthèse globale courte de ces résultats de sondage.
 
-Métadonnées et statistiques agrégées (JSON) :
+Données JSON :
 ${payload}
 
 Règles :
-- Cite exactement les pourcentages et effectifs fournis.
-- Pour les questions texte, seul le nombre de réponses est disponible — ne pas spéculer sur le contenu.
-- Mentionne la taille de l'échantillon (${dataset.responseCount} réponses) dans la synthèse.
-- Mets en avant les tendances principales et les croisements notables.
-- Termine par un bref avertissement indiquant que ce rapport est généré par IA et doit être vérifié.`;
+- Commence par la taille d'échantillon (${dataset.responseCount} réponses) dans ## Synthèse (4–6 phrases max).
+- ## Points clés : 4–6 puces avec effectifs/pourcentages exacts. Uniquement les tendances les plus marquantes.
+- ## Limites : 2–3 puces courtes (échantillon, biais d'auto-déclaration, rapport généré par IA).
+- Aucune autre section. Pas de remplissage. Pas de répétition.`;
 }
 
 export async function generateAiReport(
@@ -165,10 +174,49 @@ export async function generateAiReport(
 
   const dataset = buildAiReportDataset(survey, questions, responses);
   const prompt = buildPrompt(dataset, locale);
-  const result = await generateWithGeminiFallback(prompt, systemInstruction(locale));
+  const result = await generateWithGeminiFallback(prompt, systemInstruction(locale), {
+    maxOutputTokens: 2048,
+    temperature: 0.25,
+  });
 
   return {
     report: result.text,
     responseCount: dataset.responseCount,
   };
+}
+
+export async function saveAiReport(input: {
+  surveyId: string;
+  userId: string;
+  content: string;
+  locale: string;
+}) {
+  return prisma.aiReport.create({
+    data: {
+      surveyId: input.surveyId,
+      userId: input.userId,
+      content: input.content,
+      locale: input.locale,
+    },
+    select: {
+      id: true,
+      content: true,
+      locale: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function listAiReportsForSurvey(surveyId: string, userId: string) {
+  return prisma.aiReport.findMany({
+    where: { surveyId, userId },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    select: {
+      id: true,
+      content: true,
+      locale: true,
+      createdAt: true,
+    },
+  });
 }

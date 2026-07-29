@@ -275,18 +275,24 @@
     },
     "aiReport": {
       "title": "AI analytical report",
-      "subtitle": "Summary written by AI from your aggregated statistics (no personal data).",
+      "subtitle": "Short global synthesis from your aggregated statistics (no personal data).",
       "generate": "Generate report",
-      "regenerate": "Regenerate",
+      "regenerate": "New report",
       "generating": "Analyzing…",
       "copy": "Copy",
       "copied": "Copied",
       "downloadPdf": "Download PDF",
+      "history": "Saved reports",
+      "loadingSaved": "Loading saved reports…",
+      "storageHint": "Each report is saved in your workspace and stays linked to this survey.",
+      "quotaRemaining": "Generations left today: {remaining}/{limit}",
+      "quotaUnlimited": "Unlimited generation (superadmin)",
       "disclaimer": "AI-generated report — verify before any academic use. Official figures remain those in charts and exports.",
       "errors": {
         "apiKeyMissing": "AI report is not available at the moment.",
         "noResponses": "No responses to analyze.",
         "quotaExceeded": "Generation limit reached. Try again later.",
+        "dailyLimit": "Limit reached: 2 AI reports per day. Try again tomorrow.",
         "generationFailed": "Could not generate the report. Please try again.",
         "unauthorized": "Access denied."
       }

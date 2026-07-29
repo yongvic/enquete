@@ -275,18 +275,24 @@
     },
     "aiReport": {
       "title": "Rapport analytique IA",
-      "subtitle": "Synthèse rédigée par IA à partir de vos statistiques agrégées (sans données nominatives).",
+      "subtitle": "Synthèse globale courte à partir de vos statistiques agrégées (sans données nominatives).",
       "generate": "Générer le rapport",
-      "regenerate": "Régénérer",
+      "regenerate": "Nouveau rapport",
       "generating": "Analyse en cours…",
       "copy": "Copier",
       "copied": "Copié",
       "downloadPdf": "Télécharger PDF",
+      "history": "Rapports enregistrés",
+      "loadingSaved": "Chargement des rapports enregistrés…",
+      "storageHint": "Chaque rapport est enregistré dans votre espace et reste lié à ce sondage.",
+      "quotaRemaining": "Générations restantes aujourd'hui : {remaining}/{limit}",
+      "quotaUnlimited": "Génération illimitée (superadmin)",
       "disclaimer": "Rapport généré par intelligence artificielle — à vérifier avant toute utilisation académique. Les chiffres officiels restent ceux des graphiques et exports.",
       "errors": {
         "apiKeyMissing": "Le rapport IA n'est pas disponible pour le moment.",
         "noResponses": "Aucune réponse à analyser.",
         "quotaExceeded": "Limite de génération atteinte. Réessayez plus tard.",
+        "dailyLimit": "Limite atteinte : 2 rapports IA par jour. Réessayez demain.",
         "generationFailed": "Impossible de générer le rapport. Réessayez.",
         "unauthorized": "Accès refusé."
       }

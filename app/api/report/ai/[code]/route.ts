@@ -1,12 +1,50 @@
 import { getAuthorizedSurveyExport } from "@/lib/export-report";
-import { generateAiReport } from "@/lib/ai-report";
+import { generateAiReport, listAiReportsForSurvey, saveAiReport } from "@/lib/ai-report";
+import { assertCanGenerateAiReport, getAiReportQuota } from "@/lib/ai-report-quota";
+import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ code: string }> }
+) {
+  const { code } = await params;
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 403 });
+  }
+
+  const data = await getAuthorizedSurveyExport(code);
+  if (!data) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 403 });
+  }
+
+  const [reports, quota] = await Promise.all([
+    listAiReportsForSurvey(data.survey.id, session.user.id),
+    getAiReportQuota(session.user.id, session.user.role),
+  ]);
+
+  return NextResponse.json({
+    reports: reports.map((r) => ({
+      id: r.id,
+      content: r.content,
+      locale: r.locale,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    quota,
+  });
+}
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   const { code } = await params;
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 403 });
+  }
+
   const data = await getAuthorizedSurveyExport(code);
   if (!data) {
     return NextResponse.json({ error: "unauthorized" }, { status: 403 });
@@ -21,13 +59,38 @@ export async function POST(
   }
 
   try {
+    await assertCanGenerateAiReport(session.user.id, session.user.role);
+
     const result = await generateAiReport(
       data.survey,
       data.questions,
       data.responses,
       locale
     );
-    return NextResponse.json(result);
+
+    const saved = await saveAiReport({
+      surveyId: data.survey.id,
+      userId: session.user.id,
+      content: result.report,
+      locale,
+    });
+
+    const quota = await getAiReportQuota(session.user.id, session.user.role);
+    const reports = await listAiReportsForSurvey(data.survey.id, session.user.id);
+
+    return NextResponse.json({
+      report: saved.content,
+      reportId: saved.id,
+      createdAt: saved.createdAt.toISOString(),
+      responseCount: result.responseCount,
+      reports: reports.map((r) => ({
+        id: r.id,
+        content: r.content,
+        locale: r.locale,
+        createdAt: r.createdAt.toISOString(),
+      })),
+      quota,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
     console.error("[ai-report]", message);
@@ -36,6 +99,9 @@ export async function POST(
     }
     if (message === "NO_RESPONSES") {
       return NextResponse.json({ error: "noResponses" }, { status: 400 });
+    }
+    if (message === "DAILY_LIMIT") {
+      return NextResponse.json({ error: "dailyLimit" }, { status: 429 });
     }
 
     const lower = message.toLowerCase();
