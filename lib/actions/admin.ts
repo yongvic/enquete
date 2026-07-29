@@ -17,6 +17,8 @@ export async function getPlatformStats(locale: string) {
     draftSurveys,
     totalResponses,
     responsesWeek,
+    totalFeedback,
+    feedbackWeek,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
@@ -24,6 +26,8 @@ export async function getPlatformStats(locale: string) {
     prisma.survey.count({ where: { status: SurveyStatus.DRAFT } }),
     prisma.response.count(),
     prisma.response.count({ where: { submittedAt: { gte: sevenDaysAgo } } }),
+    prisma.feedback.count(),
+    prisma.feedback.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
   ]);
 
   return {
@@ -33,6 +37,8 @@ export async function getPlatformStats(locale: string) {
     draftSurveys,
     totalResponses,
     responsesWeek,
+    totalFeedback,
+    feedbackWeek,
   };
 }
 

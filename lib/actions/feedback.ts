@@ -34,7 +34,8 @@ export async function submitFeedback(input: {
     },
   });
 
-  revalidatePath("/admin");
+  revalidatePath("/fr/admin");
+  revalidatePath("/en/admin");
   return { success: true as const };
 }
 
