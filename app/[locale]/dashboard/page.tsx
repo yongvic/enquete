@@ -4,7 +4,23 @@ import { getFeedbackOverview } from "@/lib/actions/feedback";
 import { getMySurveys } from "@/lib/actions/survey";
 import { isSuperAdmin } from "@/lib/roles";
 import { requireAuth } from "@/lib/session";
+import { buildPageMetadata } from "@/lib/seo";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: "/dashboard",
+    title: locale === "en" ? "My workspace" : "Mon espace",
+    noIndex: true,
+  });
+}
 
 export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

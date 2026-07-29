@@ -163,6 +163,17 @@ Voir [`.env.example`](./.env.example) pour le modèle complet.
 
 ---
 
+## SEO & référencement
+
+- Metadata Open Graph / Twitter par page (`lib/seo.ts`)
+- `sitemap.xml` et `robots.txt` générés automatiquement
+- Manifest PWA (`/manifest.webmanifest`)
+- Données structurées JSON-LD (Organization + WebApplication)
+- Pages privées (dashboard, admin, résultats) en `noindex`
+- Image de partage : `/promo/promo-linkedin.png`
+
+Conseil : définissez `NEXT_PUBLIC_APP_URL` / `AUTH_URL` sur l’URL de production pour des canonicals corrects.
+
 ## Déploiement Vercel
 
 1. Importez le dépôt sur [Vercel](https://vercel.com)

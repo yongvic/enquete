@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  ...buildPageMetadata({ locale: "fr" }),
   title: {
     default: "Sondage — Collecte & analyse de données",
     template: "%s · Sondage",
   },
-  description:
-    "Créez des sondages, collectez des réponses sans compte et analysez vos résultats avec graphiques, exports Excel/PDF et rapport IA.",
 };
 
 export const viewport: Viewport = {
@@ -14,6 +14,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f5ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e2a38" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

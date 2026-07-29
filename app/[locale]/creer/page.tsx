@@ -3,7 +3,23 @@ import { SurveyWizard } from "@/components/SurveyWizard";
 import { getDraft, getMyDrafts, getPublishedSurveyForEdit } from "@/lib/actions/survey";
 import { requireAuth } from "@/lib/session";
 import { canAccessEnqueteTemplate } from "@/lib/template-access";
+import { buildPageMetadata } from "@/lib/seo";
 import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: "/creer",
+    title: locale === "en" ? "Create a survey" : "Créer un sondage",
+    noIndex: true,
+  });
+}
 
 export default async function CreatePage({
   params,

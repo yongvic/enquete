@@ -3,7 +3,18 @@ import { AdminStats } from "@/components/AdminStats";
 import { getPlatformStats, getRecentUsers } from "@/lib/actions/admin";
 import { getRecentFeedback } from "@/lib/actions/feedback";
 import { requireSuperAdmin } from "@/lib/session";
+import { buildPageMetadata } from "@/lib/seo";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({ locale, path: "/admin", title: "Admin", noIndex: true });
+}
 
 export default async function AdminPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

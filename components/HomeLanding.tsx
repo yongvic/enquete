@@ -21,12 +21,12 @@ export async function HomeLanding() {
       <div className="landing-hero px-4 sm:px-8 pb-16 pt-4 sm:pt-8">
         <div className="max-w-5xl mx-auto">
           {/* Hero */}
-          <section className="landing-hero__main grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          <section className="landing-hero__main grid lg:grid-cols-2 gap-10 lg:gap-14 items-center" aria-labelledby="home-hero-title">
             <div>
               <p className="sondage-mono text-[11px] tracking-[0.2em] uppercase mb-4" style={{ color: OCHRE }}>
                 {t("eyebrow")}
               </p>
-              <h1 className="text-3xl sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.12] tracking-tight whitespace-pre-line">
+              <h1 id="home-hero-title" className="text-3xl sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.12] tracking-tight whitespace-pre-line">
                 {t("title")}
               </h1>
               <p className="sondage-sans text-base sm:text-[17px] mt-5 leading-relaxed landing-hero__subtitle">
@@ -55,8 +55,8 @@ export async function HomeLanding() {
           </section>
 
           {/* Features */}
-          <section className="mt-16 sm:mt-20">
-            <h2 className="sondage-mono text-xs tracking-[0.18em] uppercase mb-6" style={{ color: SLATE }}>
+          <section className="mt-16 sm:mt-20" aria-labelledby="home-features-title">
+            <h2 id="home-features-title" className="sondage-mono text-xs tracking-[0.18em] uppercase mb-6" style={{ color: SLATE }}>
               {t("featuresTitle")}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
