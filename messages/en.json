@@ -102,7 +102,10 @@
     "back": "Back",
     "continue": "Continue",
     "saveDraft": "Save draft",
-    "draftSaved": "Draft saved."
+    "draftSaved": "Draft saved.",
+    "editPublishedTitle": "Edit published survey",
+    "editPublishedResponses": "{count} response(s) received",
+    "editPublishedNote": "The share code and link stay the same. Avoid deleting questions that already have answers — existing responses are linked to them."
   },
   "create": {
     "newSurvey": "New survey",
@@ -113,6 +116,8 @@
     "addQuestion": "Add a question",
     "publish": "Publish survey",
     "publishing": "Publishing…",
+    "saveChanges": "Save changes",
+    "savingChanges": "Saving…",
     "questionLabel": "Q{index}",
     "questionPlaceholder": "Question text",
     "addOption": "+ option",

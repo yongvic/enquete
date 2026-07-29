@@ -102,7 +102,10 @@
     "back": "Retour",
     "continue": "Continuer",
     "saveDraft": "Enregistrer brouillon",
-    "draftSaved": "Brouillon enregistré."
+    "draftSaved": "Brouillon enregistré.",
+    "editPublishedTitle": "Modifier le sondage publié",
+    "editPublishedResponses": "{count} réponse(s) reçue(s)",
+    "editPublishedNote": "Le code et le lien de partage restent identiques. Évitez de supprimer des questions déjà répondues — les réponses existantes y sont rattachées."
   },
   "create": {
     "newSurvey": "Nouveau sondage",
@@ -113,6 +116,8 @@
     "addQuestion": "Ajouter une question",
     "publish": "Publier le sondage",
     "publishing": "Publication…",
+    "saveChanges": "Enregistrer les modifications",
+    "savingChanges": "Enregistrement…",
     "questionLabel": "Q{index}",
     "questionPlaceholder": "Intitulé de la question",
     "addOption": "+ option",

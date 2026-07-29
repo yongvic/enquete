@@ -17,7 +17,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
-import { publishSurvey, saveDraft } from "@/lib/actions/survey";
+import { publishSurvey, saveDraft, updatePublishedSurvey } from "@/lib/actions/survey";
 import { loadEnqueteTemplateForUser } from "@/lib/actions/template";
 import { INK, OCHRE, RUST, SLATE, Question, QuestionType, uuid } from "@/lib/constants";
 
@@ -44,21 +44,37 @@ interface SurveyWizardProps {
     description?: string | null;
     questions: Question[];
   } | null;
+  initialPublished?: {
+    id: string;
+    code: string;
+    title: string;
+    description?: string | null;
+    questions: Question[];
+    responseCount: number;
+  } | null;
 }
 
-export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft = null }: SurveyWizardProps) {
+export function SurveyWizard({
+  drafts = [],
+  canUseTemplate = false,
+  initialDraft = null,
+  initialPublished = null,
+}: SurveyWizardProps) {
   const t = useTranslations("wizard");
   const tc = useTranslations("create");
   const router = useRouter();
 
-  const [step, setStep] = useState<WizardStep>(initialDraft ? "info" : "start");
-  const [draftId, setDraftId] = useState<string | undefined>(initialDraft?.id);
-  const [title, setTitle] = useState(initialDraft?.title || "");
-  const [description, setDescription] = useState(initialDraft?.description || "");
+  const editingPublished = !!initialPublished;
+  const initial = initialPublished || initialDraft;
+
+  const [step, setStep] = useState<WizardStep>(initial ? "info" : "start");
+  const [surveyId, setSurveyId] = useState<string | undefined>(initial?.id);
+  const [publishedCode] = useState(initialPublished?.code);
+  const [responseCount] = useState(initialPublished?.responseCount ?? 0);
+  const [title, setTitle] = useState(initial?.title || "");
+  const [description, setDescription] = useState(initial?.description || "");
   const [questions, setQuestions] = useState<Question[]>(
-    initialDraft?.questions?.length
-      ? initialDraft.questions
-      : [emptyQuestion()]
+    initial?.questions?.length ? initial.questions : [emptyQuestion()]
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -86,7 +102,7 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
     setTitle("");
     setDescription("");
     setQuestions([emptyQuestion()]);
-    setDraftId(undefined);
+    setSurveyId(undefined);
     setStep("info");
   };
 
@@ -103,7 +119,7 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
     setTitle(template.title);
     setDescription(template.description);
     setQuestions(template.questions.map((q) => ({ ...q, id: uuid() })));
-    setDraftId(undefined);
+    setSurveyId(undefined);
     setStep("info");
   };
 
@@ -118,13 +134,24 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
     }
     setBusy(true);
     setError("");
-    const result = await saveDraft({ draftId, title, description, questions });
+    if (editingPublished && surveyId) {
+      const result = await updatePublishedSurvey({ surveyId, title, description, questions });
+      setBusy(false);
+      if (result.error) {
+        setError(tc("errors.publish"));
+        return false;
+      }
+      setSavedHint(true);
+      setTimeout(() => setSavedHint(false), 2000);
+      return true;
+    }
+    const result = await saveDraft({ draftId: surveyId, title, description, questions });
     setBusy(false);
     if (result.error) {
       setError(tc("errors.publish"));
       return false;
     }
-    setDraftId(result.draftId);
+    setSurveyId(result.draftId);
     setSavedHint(true);
     setTimeout(() => setSavedHint(false), 2000);
     return true;
@@ -138,7 +165,17 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
     }
     setBusy(true);
     setError("");
-    const result = await publishSurvey({ draftId, title, description, questions });
+    if (editingPublished && surveyId) {
+      const result = await updatePublishedSurvey({ surveyId, title, description, questions });
+      setBusy(false);
+      if (result.error) {
+        setError(tc("errors.publish"));
+        return;
+      }
+      router.push(`/resultats/${result.code}`);
+      return;
+    }
+    const result = await publishSurvey({ draftId: surveyId, title, description, questions });
     setBusy(false);
     if (result.error) {
       setError(tc("errors.publish"));
@@ -152,6 +189,27 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
 
   return (
     <div className="pt-6 pb-8">
+      {editingPublished && step !== "start" && (
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">{t("editPublishedTitle")}</h1>
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <span className="sondage-mono text-xs tracking-widest" style={{ color: OCHRE }}>
+              {publishedCode}
+            </span>
+            {responseCount > 0 && (
+              <span className="sondage-sans text-xs" style={{ color: SLATE }}>
+                {t("editPublishedResponses", { count: responseCount })}
+              </span>
+            )}
+          </div>
+          {responseCount > 0 && (
+            <p className="sondage-sans text-xs mt-3 py-2 px-3" style={{ background: `${OCHRE}15`, color: `${INK}bb` }}>
+              {t("editPublishedNote")}
+            </p>
+          )}
+        </div>
+      )}
+
       {step !== "start" && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
@@ -340,8 +398,10 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
         <div className="flex flex-col sm:flex-row gap-3 mt-8">
           <button
             onClick={() => {
-              if (step === "info") setStep("start");
-              else if (step === "questions") setStep("info");
+              if (step === "info") {
+                if (editingPublished) router.push("/dashboard");
+                else setStep("start");
+              } else if (step === "questions") setStep("info");
               else setStep("questions");
             }}
             className="sondage-btn sondage-sans flex items-center justify-center gap-2 py-3 px-4 text-sm"
@@ -358,7 +418,7 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
               style={{ border: `1px solid ${SLATE}88` }}
             >
               {busy ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-              {t("saveDraft")}
+              {editingPublished ? tc("saveChanges") : t("saveDraft")}
             </button>
           )}
 
@@ -370,7 +430,13 @@ export function SurveyWizard({ drafts = [], canUseTemplate = false, initialDraft
               style={{ background: INK, opacity: busy ? 0.7 : 1 }}
             >
               {busy ? <Loader2 size={16} className="animate-spin" /> : <Send size={15} />}
-              {busy ? tc("publishing") : tc("publish")}
+              {busy
+                ? editingPublished
+                  ? tc("savingChanges")
+                  : tc("publishing")
+                : editingPublished
+                  ? tc("saveChanges")
+                  : tc("publish")}
             </button>
           ) : (
             <button

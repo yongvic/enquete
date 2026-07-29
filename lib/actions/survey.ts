@@ -200,6 +200,70 @@ export async function getDraft(draftId: string) {
   };
 }
 
+export async function getPublishedSurveyForEdit(surveyId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const survey = await prisma.survey.findFirst({
+    where: { id: surveyId, userId: session.user.id, status: SurveyStatus.PUBLISHED },
+    select: {
+      id: true,
+      code: true,
+      title: true,
+      description: true,
+      questions: true,
+      _count: { select: { responses: true } },
+    },
+  });
+  if (!survey?.code) return null;
+
+  return {
+    id: survey.id,
+    code: survey.code,
+    title: survey.title,
+    description: survey.description,
+    questions: survey.questions as unknown as Question[],
+    responseCount: survey._count.responses,
+  };
+}
+
+export async function updatePublishedSurvey(input: {
+  surveyId: string;
+  title: string;
+  description?: string;
+  questions: Question[];
+}) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "unauthorized" as const };
+
+  const parsed = surveyInputSchema.safeParse(input);
+  if (!parsed.success) return { error: "invalid" as const };
+
+  const err = validateSurveyInput(input);
+  if (err) return { error: err as "title" | "questions" | "questionText" | "options" };
+
+  const survey = await prisma.survey.findFirst({
+    where: { id: input.surveyId, userId: session.user.id, status: SurveyStatus.PUBLISHED },
+  });
+  if (!survey?.code) return { error: "notFound" as const };
+
+  const questions = normalizeQuestions(parsed.data.questions);
+  const updated = await prisma.survey.update({
+    where: { id: survey.id },
+    data: {
+      title: parsed.data.title.trim(),
+      description: parsed.data.description?.trim() || null,
+      questions: questions as Prisma.InputJsonValue,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/resultats/${updated.code}`);
+  revalidatePath(`/publie/${updated.code}`);
+  revalidatePath(`/repondre/${updated.code}`);
+  return { success: true as const, code: updated.code! };
+}
+
 export async function deleteSurvey(surveyId: string) {
   const session = await auth();
   if (!session?.user?.id) return { error: "unauthorized" as const };

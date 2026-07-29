@@ -177,6 +177,14 @@ function SurveyCard({
       </div>
       <div className="flex gap-2 shrink-0 flex-wrap">
         <Link
+          href={`/creer?edit=${survey.id}`}
+          className="sondage-btn sondage-sans text-xs px-3 py-2 flex items-center gap-1.5"
+          style={{ border: `1px solid ${SLATE}88` }}
+          title={t("edit")}
+        >
+          <FileEdit size={13} /> {t("edit")}
+        </Link>
+        <Link
           href={`/publie/${survey.code}`}
           className="sondage-btn sondage-sans text-xs px-3 py-2 flex items-center gap-1.5"
           style={{ border: `1px solid ${INK}` }}
