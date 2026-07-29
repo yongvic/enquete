@@ -13,11 +13,9 @@ export async function POST(
   }
 
   let report = "";
-  let modelUsed = "gemini";
   try {
     const body = await req.json();
     report = String(body?.report || "").trim();
-    if (body?.modelUsed) modelUsed = String(body.modelUsed);
   } catch {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
@@ -26,7 +24,7 @@ export async function POST(
     return NextResponse.json({ error: "emptyReport" }, { status: 400 });
   }
 
-  const buffer = buildAiReportPdf(data.survey.title, data.survey.code!, report, modelUsed);
+  const buffer = buildAiReportPdf(data.survey.title, data.survey.code!, report);
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

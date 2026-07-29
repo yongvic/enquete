@@ -169,7 +169,6 @@ export async function generateAiReport(
 
   return {
     report: result.text,
-    modelUsed: result.modelUsed,
     responseCount: dataset.responseCount,
   };
 }

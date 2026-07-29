@@ -14,7 +14,6 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
   const t = useTranslations("results.aiReport");
   const locale = useLocale();
   const [report, setReport] = useState<string | null>(null);
-  const [modelUsed, setModelUsed] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -34,7 +33,6 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
         return;
       }
       setReport(data.report);
-      setModelUsed(data.modelUsed);
     } catch {
       setError(t("errors.generationFailed"));
     } finally {
@@ -54,7 +52,7 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
     const res = await fetch(`/api/report/ai/${surveyCode}/pdf`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ report, modelUsed }),
+      body: JSON.stringify({ report }),
     });
     if (!res.ok) return;
     const blob = await res.blob();
@@ -100,11 +98,6 @@ export function AiReportPanel({ surveyCode, responseCount }: AiReportPanelProps)
       {report && (
         <div className="mt-5">
           <div className="flex gap-2 flex-wrap mb-3">
-            {modelUsed && (
-              <span className="sondage-mono text-[10px] tracking-wide uppercase px-2 py-1" style={{ color: SLATE, border: `1px solid ${SLATE}44` }}>
-                {t("modelUsed", { model: modelUsed })}
-              </span>
-            )}
             <button
               onClick={copyReport}
               className="sondage-btn sondage-sans text-xs px-3 py-1.5 flex items-center gap-1.5"

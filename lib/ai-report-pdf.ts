@@ -5,8 +5,7 @@ const INK_RGB: [number, number, number] = [30, 42, 56];
 export function buildAiReportPdf(
   surveyTitle: string,
   surveyCode: string,
-  report: string,
-  modelUsed: string
+  report: string
 ): Buffer {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -29,7 +28,7 @@ export function buildAiReportPdf(
   doc.setFontSize(9);
   doc.setTextColor(100, 100, 100);
   doc.text(
-    `Code: ${surveyCode} · Modèle: ${modelUsed} · ${new Date().toLocaleDateString("fr-FR")}`,
+    `Code: ${surveyCode} · ${new Date().toLocaleDateString("fr-FR")}`,
     margin,
     y
   );
