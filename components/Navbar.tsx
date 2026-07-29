@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
   LayoutDashboard,
@@ -113,6 +114,11 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
   const t = useTranslations("common");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setOpen(false);
@@ -183,7 +189,101 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
 
   const logoTarget = logoHref ?? (isLoggedIn ? "/dashboard" : "/");
 
+  const mobileDrawer =
+    open && mounted ? (
+      <div className="navbar-drawer lg:hidden" role="dialog" aria-modal="true">
+        <button type="button" className="navbar-drawer__backdrop" aria-label={t("nav.closeMenu")} onClick={close} />
+
+        <div className="navbar-drawer__panel">
+          <div className="navbar-drawer__handle" aria-hidden />
+
+          <div className="navbar-drawer__hero">
+            <div className="navbar-drawer__hero-top">
+              <BrandLogo variant="icon" href={logoTarget} className="navbar-drawer__logo" />
+              <button type="button" onClick={close} className="navbar-drawer__close sondage-btn" aria-label={t("nav.closeMenu")}>
+                <X size={20} />
+              </button>
+            </div>
+            <p className="navbar-drawer__eyebrow sondage-mono">{t("nav.menu")}</p>
+            <p className="navbar-drawer__tagline sondage-sans">
+              {isLoggedIn ? t("nav.menuLoggedIn") : t("nav.menuGuest")}
+            </p>
+          </div>
+
+          <div className="navbar-drawer__scroll">
+            {isLoggedIn && mobileMain[0]?.featured && (
+              <div className="navbar-drawer__featured px-4 pt-2 pb-1">
+                <MobileNavCard
+                  item={mobileMain[0]}
+                  active={isActive(mobileMain[0].href)}
+                  onNavigate={close}
+                  variant="featured"
+                />
+              </div>
+            )}
+
+            {mobileMain.length > (isLoggedIn ? 1 : 0) && (
+              <div className="navbar-drawer__section px-4">
+                <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionNav")}</p>
+                <div className="navbar-drawer__grid">
+                  {mobileMain.slice(isLoggedIn ? 1 : 0).map((item) => (
+                    <MobileNavCard
+                      key={item.href + item.label}
+                      item={item}
+                      active={isActive(item.href)}
+                      onNavigate={close}
+                      variant="default"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {mobileAccount.length > 0 && (
+              <div className="navbar-drawer__section px-4">
+                <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionAccount")}</p>
+                <div className="navbar-drawer__stack">
+                  {mobileAccount.map((item) => (
+                    <MobileNavCard
+                      key={item.href + item.label}
+                      item={item}
+                      active={isActive(item.href)}
+                      onNavigate={close}
+                      variant={item.primary ? "primary" : "default"}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="navbar-drawer__foot">
+            <div className="navbar-drawer__locale">
+              <span className="sondage-mono text-[10px] tracking-widest uppercase" style={{ color: SLATE }}>
+                {t("nav.language")}
+              </span>
+              <LocaleSwitcher />
+            </div>
+            {isLoggedIn && (
+              <button
+                type="button"
+                onClick={() => {
+                  close();
+                  signOut({ callbackUrl: window.location.origin });
+                }}
+                className="navbar-drawer__logout sondage-btn sondage-sans w-full flex items-center justify-center gap-2"
+              >
+                <LogOut size={16} />
+                {t("logout")}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    ) : null;
+
   return (
+    <>
     <header className="navbar app-header sticky top-0 z-30 px-4 sm:px-8 py-3 sm:py-4">
       <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 min-w-0">
         <div className="min-w-0 shrink">
@@ -244,98 +344,9 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
           </button>
         </div>
       </div>
-
-      {open && (
-        <div className="navbar-drawer lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true">
-          <button type="button" className="navbar-drawer__backdrop absolute inset-0" aria-label={t("nav.closeMenu")} onClick={close} />
-
-          <div className="navbar-drawer__panel absolute inset-x-0 bottom-0 flex flex-col">
-            <div className="navbar-drawer__handle" aria-hidden />
-
-            <div className="navbar-drawer__hero">
-              <div className="navbar-drawer__hero-top">
-                <BrandLogo variant="icon" href={logoTarget} className="navbar-drawer__logo" />
-                <button type="button" onClick={close} className="navbar-drawer__close sondage-btn" aria-label={t("nav.closeMenu")}>
-                  <X size={20} />
-                </button>
-              </div>
-              <p className="navbar-drawer__eyebrow sondage-mono">{t("nav.menu")}</p>
-              <p className="navbar-drawer__tagline sondage-sans">
-                {isLoggedIn ? t("nav.menuLoggedIn") : t("nav.menuGuest")}
-              </p>
-            </div>
-
-            <div className="navbar-drawer__scroll flex-1 overflow-y-auto">
-              {isLoggedIn && mobileMain[0]?.featured && (
-                <div className="navbar-drawer__featured px-4 pt-2">
-                  <MobileNavCard
-                    item={mobileMain[0]}
-                    active={isActive(mobileMain[0].href)}
-                    onNavigate={close}
-                    variant="featured"
-                  />
-                </div>
-              )}
-
-              {mobileMain.length > (isLoggedIn ? 1 : 0) && (
-                <div className="navbar-drawer__section px-4">
-                  <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionNav")}</p>
-                  <div className="navbar-drawer__grid">
-                    {mobileMain.slice(isLoggedIn ? 1 : 0).map((item, i) => (
-                      <MobileNavCard
-                        key={item.href + item.label}
-                        item={item}
-                        active={isActive(item.href)}
-                        onNavigate={close}
-                        variant="default"
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {mobileAccount.length > 0 && (
-                <div className="navbar-drawer__section px-4">
-                  <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionAccount")}</p>
-                  <div className="navbar-drawer__stack">
-                    {mobileAccount.map((item) => (
-                      <MobileNavCard
-                        key={item.href + item.label}
-                        item={item}
-                        active={isActive(item.href)}
-                        onNavigate={close}
-                        variant={item.primary ? "primary" : "default"}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="navbar-drawer__foot">
-              <div className="navbar-drawer__locale">
-                <span className="sondage-mono text-[10px] tracking-widest uppercase" style={{ color: SLATE }}>
-                  {t("nav.language")}
-                </span>
-                <LocaleSwitcher />
-              </div>
-              {isLoggedIn && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    close();
-                    signOut({ callbackUrl: window.location.origin });
-                  }}
-                  className="navbar-drawer__logout sondage-btn sondage-sans w-full flex items-center justify-center gap-2"
-                >
-                  <LogOut size={16} />
-                  {t("logout")}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
+
+      {mobileDrawer && createPortal(mobileDrawer, document.body)}
+    </>
   );
 }
