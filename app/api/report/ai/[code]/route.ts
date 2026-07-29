@@ -37,13 +37,26 @@ export async function POST(
     if (message === "NO_RESPONSES") {
       return NextResponse.json({ error: "noResponses" }, { status: 400 });
     }
-    if (
-      message.includes("ALL_GEMINI_MODELS_FAILED") ||
-      message.toLowerCase().includes("quota") ||
-      message.toLowerCase().includes("resource_exhausted")
-    ) {
+
+    const lower = message.toLowerCase();
+    const isQuota =
+      lower.includes("quota") ||
+      lower.includes("resource_exhausted") ||
+      lower.includes("rate limit") ||
+      (lower.includes("all_gemini_models_failed") &&
+        (lower.includes("quota") || lower.includes("resource_exhausted") || lower.includes("429")));
+
+    if (isQuota) {
       return NextResponse.json({ error: "quotaExceeded" }, { status: 429 });
     }
+
+    if (message.includes("ALL_GEMINI_MODELS_FAILED")) {
+      return NextResponse.json(
+        { error: "generationFailed", detail: message.slice(0, 500) },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({ error: "generationFailed", detail: message.slice(0, 500) }, { status: 500 });
   }
 }
