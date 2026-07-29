@@ -20,7 +20,19 @@
       "closeMenu": "Close menu",
       "home": "Home",
       "answer": "Answer",
-      "create": "Create survey"
+      "create": "Create survey",
+      "dashboardDesc": "Your surveys, drafts and results",
+      "createDesc": "Step-by-step wizard",
+      "answerDesc": "Enter a survey code",
+      "homeDesc": "Discover the platform",
+      "loginDesc": "Access your workspace",
+      "registerDesc": "Get started for free",
+      "adminDesc": "Stats and feedback",
+      "sectionNav": "Navigation",
+      "sectionAccount": "Account",
+      "language": "Language",
+      "menuLoggedIn": "Quick access to your workspace and tools.",
+      "menuGuest": "Explore the platform or sign in."
     }
   },
   "home": {
@@ -89,6 +101,8 @@
     "confirmDelete": "Delete this survey? This cannot be undone.",
     "responseCount": "{count} response(s)",
     "securityNote": "Only you can see your survey results. The code is for responding only, never for viewing statistics.",
+    "feedbackHint": "Feedback received via the platform widget.",
+    "viewFullAdmin": "Full administration",
     "stats": {
       "published": "Published",
       "drafts": "Drafts",
@@ -111,6 +125,7 @@
     "noFeedback": "No feedback yet.",
     "message": "Message",
     "date": "Date",
+    "feedbackSummary": "{total} total · {week} (7d)",
     "surveys": "Surveys",
     "rating": "Rating",
     "page": "Page",

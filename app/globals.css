@@ -350,49 +350,265 @@ body {
 }
 
 .navbar-drawer__backdrop {
-  background: rgb(30 42 56 / 0.45);
+  background: rgb(30 42 56 / 0.5);
+  backdrop-filter: blur(4px);
+  animation: navbar-fade-in 0.25s ease-out;
 }
 
 .navbar-drawer__panel {
   background: var(--paper);
-  border-left: 1px solid color-mix(in srgb, var(--slate) 28%, transparent);
-  box-shadow: -8px 0 32px rgb(30 42 56 / 0.12);
-  width: min(100%, 22rem);
-  animation: navbar-slide-in 0.22s ease-out;
+  max-height: min(92dvh, 720px);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 48px rgb(30 42 56 / 0.18);
+  animation: navbar-sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.navbar-drawer__head {
-  border-bottom: 1px solid color-mix(in srgb, var(--slate) 28%, transparent);
+.navbar-drawer__handle {
+  width: 2.75rem;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--slate) 55%, transparent);
+  margin: 0.65rem auto 0;
+  flex-shrink: 0;
+}
+
+.navbar-drawer__hero {
+  padding: 0.5rem 1.25rem 1.25rem;
+  background: linear-gradient(145deg, var(--brand-dark) 0%, #1a2430 100%);
+  color: #f7f5ef;
+  border-radius: 22px 22px 0 0;
+  margin-top: -4px;
+}
+
+.navbar-drawer__hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.navbar-drawer__logo {
+  opacity: 0.95;
+}
+
+.navbar-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  color: #f7f5ef;
+  border: 1px solid rgb(255 255 255 / 0.15);
+}
+
+.navbar-drawer__eyebrow {
+  margin-top: 1rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+}
+
+.navbar-drawer__tagline {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgb(247 245 239 / 0.78);
+}
+
+.navbar-drawer__scroll {
+  min-height: 0;
+}
+
+.navbar-drawer__featured {
+  margin-top: -0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.navbar-drawer__section {
+  padding-top: 1.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.navbar-drawer__section-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 0.65rem;
+  padding-left: 0.15rem;
+}
+
+.navbar-drawer__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.navbar-drawer__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-nav-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--slate) 32%, transparent);
   background: #fff;
+  color: var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mobile-nav-card:active {
+  transform: scale(0.98);
+}
+
+.mobile-nav-card--featured {
+  padding: 1.1rem 1.15rem;
+  background: linear-gradient(135deg, #fff 0%, color-mix(in srgb, var(--ochre) 12%, #fff) 100%);
+  border: 1px solid color-mix(in srgb, var(--ochre) 45%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ochre) 18%, transparent);
+}
+
+.mobile-nav-card--featured .mobile-nav-card__icon {
+  background: var(--ochre);
+  color: #fff;
+}
+
+.mobile-nav-card--primary {
+  background: var(--ochre);
+  border-color: var(--ochre);
+  color: #fff;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.mobile-nav-card--primary .mobile-nav-card__icon {
+  background: rgb(255 255 255 / 0.2);
+  color: #fff;
+}
+
+.mobile-nav-card--primary .mobile-nav-card__desc {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.mobile-nav-card--active {
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.mobile-nav-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--slate) 16%, transparent);
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.mobile-nav-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mobile-nav-card__label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.mobile-nav-card__desc {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--slate);
+}
+
+.mobile-nav-card__chevron {
+  color: var(--slate);
+  opacity: 0.7;
+}
+
+.navbar-drawer__grid .mobile-nav-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-height: 6.5rem;
+}
+
+.navbar-drawer__grid .mobile-nav-card__chevron {
+  display: none;
 }
 
 .navbar-drawer__foot {
-  border-top: 1px solid color-mix(in srgb, var(--slate) 28%, transparent);
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--slate) 24%, transparent);
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
-.navbar-drawer__link {
-  font-size: 0.9375rem;
-  min-height: 3rem;
-  line-height: 1.3;
+.navbar-drawer__locale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.navbar-drawer__link span {
-  flex: 1;
+.navbar-drawer__logout {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--slate) 40%, transparent);
+  color: var(--slate);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--slate) 8%, transparent);
 }
 
-@keyframes navbar-slide-in {
+@keyframes navbar-sheet-up {
   from {
-    transform: translateX(100%);
+    transform: translateY(100%);
   }
   to {
-    transform: translateX(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes navbar-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
 .navbar-menu-btn {
   border: 1px solid color-mix(in srgb, var(--slate) 40%, transparent);
-  border-radius: 6px;
+  border-radius: 10px;
+  color: var(--ink);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.navbar-menu-btn--open {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  border-color: color-mix(in srgb, var(--ink) 25%, transparent);
 }
 
 .navbar-link:hover {

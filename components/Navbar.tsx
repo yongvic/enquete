@@ -2,7 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
-import { LayoutDashboard, Menu, Shield, X, PlusCircle, Home, MessageSquareReply } from "lucide-react";
+import {
+  LayoutDashboard,
+  Menu,
+  Shield,
+  X,
+  PlusCircle,
+  Home,
+  MessageSquareReply,
+  ChevronRight,
+  LogIn,
+  UserPlus,
+  LogOut,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 import { Role } from "@prisma/client";
@@ -14,6 +26,7 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 interface NavItem {
   href: string;
   label: string;
+  description?: string;
   icon?: React.ReactNode;
   primary?: boolean;
   accent?: boolean;
@@ -24,59 +37,74 @@ interface NavItem {
 interface NavbarProps {
   isLoggedIn?: boolean;
   role?: Role;
-  /** Hide login / register (auth pages) */
   compactAuth?: boolean;
   logoHref?: string;
   priority?: boolean;
 }
 
-function NavLink({
+function DesktopNavLink({ item, active }: { item: NavItem; active: boolean }) {
+  const style: React.CSSProperties = item.accent
+    ? { color: OCHRE }
+    : active
+      ? { color: INK, background: `${SLATE}18`, fontWeight: 600 }
+      : { color: SLATE };
+
+  return (
+    <Link
+      href={item.href}
+      className="navbar-link sondage-btn sondage-sans text-sm font-medium flex items-center gap-2 px-3.5 py-2 rounded-md transition-colors"
+      style={style}
+    >
+      {item.icon}
+      {item.label}
+    </Link>
+  );
+}
+
+function MobileNavCard({
   item,
   active,
   onNavigate,
-  mobile = false,
+  variant = "default",
 }: {
   item: NavItem;
   active: boolean;
   onNavigate?: () => void;
-  mobile?: boolean;
+  variant?: "default" | "featured" | "primary";
 }) {
-  const base = mobile
-    ? "navbar-drawer__link sondage-btn sondage-sans font-medium flex items-center gap-3 w-full px-4 py-3.5 rounded-md transition-colors"
-    : "navbar-link sondage-btn sondage-sans text-sm font-medium flex items-center gap-2 px-3 py-2 rounded-sm transition-colors";
+  const className = [
+    "mobile-nav-card sondage-btn w-full text-left",
+    variant === "featured" ? "mobile-nav-card--featured" : "",
+    variant === "primary" ? "mobile-nav-card--primary" : "",
+    active ? "mobile-nav-card--active" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  let style: React.CSSProperties;
-  if (item.primary) {
-    style = { background: OCHRE, color: "#fff" };
-  } else if (item.featured) {
-    style = {
-      background: `${OCHRE}14`,
-      color: INK,
-      border: `1px solid ${OCHRE}55`,
-    };
-  } else if (item.accent) {
-    style = { color: OCHRE };
-  } else if (active) {
-    style = mobile
-      ? { color: INK, background: `${SLATE}22`, fontWeight: 600 }
-      : { color: INK, background: `${SLATE}18` };
-  } else {
-    style = mobile ? { color: INK } : { color: SLATE };
-  }
+  const content = (
+    <>
+      {item.icon && <span className="mobile-nav-card__icon">{item.icon}</span>}
+      <span className="mobile-nav-card__body">
+        <span className="mobile-nav-card__label">{item.label}</span>
+        {item.description && <span className="mobile-nav-card__desc">{item.description}</span>}
+      </span>
+      {variant !== "primary" && (
+        <ChevronRight size={18} className="mobile-nav-card__chevron shrink-0" aria-hidden />
+      )}
+    </>
+  );
 
   if (item.onClick) {
     return (
-      <button type="button" onClick={item.onClick} className={base} style={style}>
-        {item.icon}
-        <span>{item.label}</span>
+      <button type="button" onClick={item.onClick} className={className}>
+        {content}
       </button>
     );
   }
 
   return (
-    <Link href={item.href} onClick={onNavigate} className={base} style={style}>
-      {item.icon}
-      <span>{item.label}</span>
+    <Link href={item.href} onClick={onNavigate} className={className}>
+      {content}
     </Link>
   );
 }
@@ -105,28 +133,50 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
   };
 
   const desktopItems: NavItem[] = [];
-  const mobileItems: NavItem[] = [];
+  const mobileMain: NavItem[] = [];
+  const mobileAccount: NavItem[] = [];
 
   if (isLoggedIn) {
-    mobileItems.push(
-      { href: "/dashboard", label: t("dashboard"), icon: <LayoutDashboard size={20} />, featured: true },
-      { href: "/creer", label: t("nav.create"), icon: <PlusCircle size={20} /> },
-      { href: "/repondre", label: t("nav.answer"), icon: <MessageSquareReply size={20} /> },
+    const dashboardItem: NavItem = {
+      href: "/dashboard",
+      label: t("dashboard"),
+      description: t("nav.dashboardDesc"),
+      icon: <LayoutDashboard size={22} strokeWidth={2} />,
+      featured: true,
+    };
+
+    desktopItems.push({
+      href: "/dashboard",
+      label: t("dashboard"),
+      icon: <LayoutDashboard size={17} strokeWidth={2} />,
+    });
+
+    mobileMain.push(dashboardItem);
+    mobileMain.push(
+      { href: "/creer", label: t("nav.create"), description: t("nav.createDesc"), icon: <PlusCircle size={20} /> },
+      { href: "/repondre", label: t("nav.answer"), description: t("nav.answerDesc"), icon: <MessageSquareReply size={20} /> },
     );
+
     if (isSuperAdmin(role)) {
-      const adminItem = { href: "/admin", label: t("superadmin"), icon: <Shield size={20} />, accent: true };
-      mobileItems.push(adminItem);
+      const adminItem: NavItem = {
+        href: "/admin",
+        label: t("superadmin"),
+        description: t("nav.adminDesc"),
+        icon: <Shield size={20} />,
+        accent: true,
+      };
       desktopItems.push(adminItem);
+      mobileMain.push(adminItem);
     }
   } else {
-    mobileItems.push(
-      { href: "/", label: t("nav.home"), icon: <Home size={20} /> },
-      { href: "/repondre", label: t("nav.answer"), icon: <MessageSquareReply size={20} /> },
+    mobileMain.push(
+      { href: "/", label: t("nav.home"), description: t("nav.homeDesc"), icon: <Home size={20} /> },
+      { href: "/repondre", label: t("nav.answer"), description: t("nav.answerDesc"), icon: <MessageSquareReply size={20} /> },
     );
     if (!compactAuth) {
-      mobileItems.push(
-        { href: "/connexion", label: t("login"), icon: undefined },
-        { href: "/inscription", label: t("register"), primary: true },
+      mobileAccount.push(
+        { href: "/connexion", label: t("login"), description: t("nav.loginDesc"), icon: <LogIn size={20} /> },
+        { href: "/inscription", label: t("register"), description: t("nav.registerDesc"), icon: <UserPlus size={20} />, primary: true },
       );
     }
   }
@@ -141,14 +191,14 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
         </div>
 
         {desktopItems.length > 0 && (
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-end mr-2" aria-label={t("nav.main")}>
+          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center" aria-label={t("nav.main")}>
             {desktopItems.map((item) => (
-              <NavLink key={item.href + item.label} item={item} active={isActive(item.href)} />
+              <DesktopNavLink key={item.href + item.label} item={item} active={isActive(item.href)} />
             ))}
           </nav>
         )}
 
-        <div className="flex items-center gap-2 shrink-0 ml-auto">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="hidden lg:block">
             <LocaleSwitcher />
           </div>
@@ -185,12 +235,12 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
 
           <button
             type="button"
-            className="navbar-menu-btn sondage-btn flex lg:hidden items-center justify-center w-11 h-11"
+            className={`navbar-menu-btn sondage-btn flex lg:hidden items-center justify-center w-11 h-11 ${open ? "navbar-menu-btn--open" : ""}`}
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? t("nav.closeMenu") : t("nav.menu")}
           >
-            {open ? <X size={22} style={{ color: INK }} /> : <Menu size={22} style={{ color: INK }} />}
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
@@ -198,30 +248,77 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
       {open && (
         <div className="navbar-drawer lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true">
           <button type="button" className="navbar-drawer__backdrop absolute inset-0" aria-label={t("nav.closeMenu")} onClick={close} />
-          <div className="navbar-drawer__panel absolute top-0 right-0 h-full flex flex-col">
-            <div className="navbar-drawer__head flex items-center justify-between px-5 py-4">
-              <span className="sondage-mono text-xs tracking-widest uppercase font-semibold" style={{ color: INK }}>
-                {t("nav.menu")}
-              </span>
-              <button type="button" onClick={close} className="sondage-btn p-2 -mr-1" aria-label={t("nav.closeMenu")}>
-                <X size={22} style={{ color: INK }} />
-              </button>
+
+          <div className="navbar-drawer__panel absolute inset-x-0 bottom-0 flex flex-col">
+            <div className="navbar-drawer__handle" aria-hidden />
+
+            <div className="navbar-drawer__hero">
+              <div className="navbar-drawer__hero-top">
+                <BrandLogo variant="icon" href={logoTarget} className="navbar-drawer__logo" />
+                <button type="button" onClick={close} className="navbar-drawer__close sondage-btn" aria-label={t("nav.closeMenu")}>
+                  <X size={20} />
+                </button>
+              </div>
+              <p className="navbar-drawer__eyebrow sondage-mono">{t("nav.menu")}</p>
+              <p className="navbar-drawer__tagline sondage-sans">
+                {isLoggedIn ? t("nav.menuLoggedIn") : t("nav.menuGuest")}
+              </p>
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-2" aria-label={t("nav.main")}>
-              {mobileItems.map((item) => (
-                <NavLink
-                  key={item.href + item.label}
-                  item={item}
-                  active={isActive(item.href)}
-                  onNavigate={close}
-                  mobile
-                />
-              ))}
-            </nav>
+            <div className="navbar-drawer__scroll flex-1 overflow-y-auto">
+              {isLoggedIn && mobileMain[0]?.featured && (
+                <div className="navbar-drawer__featured px-4 pt-2">
+                  <MobileNavCard
+                    item={mobileMain[0]}
+                    active={isActive(mobileMain[0].href)}
+                    onNavigate={close}
+                    variant="featured"
+                  />
+                </div>
+              )}
 
-            <div className="navbar-drawer__foot px-5 py-5 flex flex-col gap-3">
-              <LocaleSwitcher />
+              {mobileMain.length > (isLoggedIn ? 1 : 0) && (
+                <div className="navbar-drawer__section px-4">
+                  <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionNav")}</p>
+                  <div className="navbar-drawer__grid">
+                    {mobileMain.slice(isLoggedIn ? 1 : 0).map((item, i) => (
+                      <MobileNavCard
+                        key={item.href + item.label}
+                        item={item}
+                        active={isActive(item.href)}
+                        onNavigate={close}
+                        variant="default"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {mobileAccount.length > 0 && (
+                <div className="navbar-drawer__section px-4">
+                  <p className="navbar-drawer__section-label sondage-mono">{t("nav.sectionAccount")}</p>
+                  <div className="navbar-drawer__stack">
+                    {mobileAccount.map((item) => (
+                      <MobileNavCard
+                        key={item.href + item.label}
+                        item={item}
+                        active={isActive(item.href)}
+                        onNavigate={close}
+                        variant={item.primary ? "primary" : "default"}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="navbar-drawer__foot">
+              <div className="navbar-drawer__locale">
+                <span className="sondage-mono text-[10px] tracking-widest uppercase" style={{ color: SLATE }}>
+                  {t("nav.language")}
+                </span>
+                <LocaleSwitcher />
+              </div>
               {isLoggedIn && (
                 <button
                   type="button"
@@ -229,9 +326,9 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
                     close();
                     signOut({ callbackUrl: window.location.origin });
                   }}
-                  className="navbar-drawer__link sondage-btn sondage-sans text-sm font-medium w-full px-4 py-3.5 text-left rounded-md"
-                  style={{ color: SLATE, border: `1px solid ${SLATE}44` }}
+                  className="navbar-drawer__logout sondage-btn sondage-sans w-full flex items-center justify-center gap-2"
                 >
+                  <LogOut size={16} />
                   {t("logout")}
                 </button>
               )}

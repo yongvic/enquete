@@ -40,6 +40,7 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
             noFeedback: t("noFeedback"),
             message: t("message"),
             date: t("date"),
+            feedbackSummary: t("feedbackSummary"),
             surveys: t("surveys"),
             privacyNote: t("privacyNote"),
             rating: t("rating"),

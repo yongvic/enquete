@@ -2,11 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { Plus, BarChart3, Share2, Trash2, Pencil, FileEdit } from "lucide-react";
+import { Plus, BarChart3, Share2, Trash2, Pencil, FileEdit, Shield } from "lucide-react";
 import { deleteSurvey } from "@/lib/actions/survey";
 import { INK, OCHRE, SLATE, RUST } from "@/lib/constants";
 import { SurveyStatus } from "@prisma/client";
 import { useState } from "react";
+import { FeedbackPanel, FeedbackItem } from "./FeedbackPanel";
 
 interface SurveyRow {
   id: string;
@@ -22,9 +23,23 @@ interface UserDashboardProps {
   published: SurveyRow[];
   drafts: SurveyRow[];
   userName?: string | null;
+  feedback?: {
+    items: FeedbackItem[];
+    total: number;
+    weekCount: number;
+    labels: {
+      title: string;
+      noFeedback: string;
+      message: string;
+      rating: string;
+      page: string;
+      date: string;
+      summary: string;
+    };
+  };
 }
 
-export function UserDashboard({ published, drafts, userName }: UserDashboardProps) {
+export function UserDashboard({ published, drafts, userName, feedback }: UserDashboardProps) {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -59,6 +74,30 @@ export function UserDashboard({ published, drafts, userName }: UserDashboardProp
           <Plus size={16} /> {t("newSurvey")}
         </Link>
       </div>
+
+      {feedback && (
+        <div className="mt-8 p-4 sm:p-5" style={{ border: `1px solid ${OCHRE}55`, background: `${OCHRE}08` }}>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-1">
+            <p className="sondage-sans text-xs" style={{ color: `${INK}99` }}>
+              {t("feedbackHint")}
+            </p>
+            <Link
+              href="/admin"
+              className="sondage-btn sondage-sans text-xs font-semibold flex items-center gap-1.5 px-2.5 py-1.5"
+              style={{ color: OCHRE, border: `1px solid ${OCHRE}66` }}
+            >
+              <Shield size={13} />
+              {t("viewFullAdmin")}
+            </Link>
+          </div>
+          <FeedbackPanel
+            items={feedback.items}
+            total={feedback.total}
+            weekCount={feedback.weekCount}
+            labels={feedback.labels}
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-3 mt-8">
         <StatCard label={t("stats.published")} value={published.length} />

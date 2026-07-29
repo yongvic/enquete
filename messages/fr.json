@@ -20,7 +20,19 @@
       "closeMenu": "Fermer le menu",
       "home": "Accueil",
       "answer": "Répondre",
-      "create": "Créer un sondage"
+      "create": "Créer un sondage",
+      "dashboardDesc": "Vos sondages, brouillons et résultats",
+      "createDesc": "Assistant pas à pas",
+      "answerDesc": "Entrer un code sondage",
+      "homeDesc": "Découvrir la plateforme",
+      "loginDesc": "Accéder à votre espace",
+      "registerDesc": "Commencer gratuitement",
+      "adminDesc": "Statistiques et feedbacks",
+      "sectionNav": "Navigation",
+      "sectionAccount": "Compte",
+      "language": "Langue",
+      "menuLoggedIn": "Accédez rapidement à votre espace et vos outils.",
+      "menuGuest": "Explorez la plateforme ou connectez-vous."
     }
   },
   "home": {
@@ -89,6 +101,8 @@
     "confirmDelete": "Supprimer ce sondage ? Cette action est irréversible.",
     "responseCount": "{count} réponse(s)",
     "securityNote": "Seul vous pouvez voir les résultats de vos sondages. Le code sert uniquement à répondre, jamais à consulter les statistiques.",
+    "feedbackHint": "Retours reçus via le widget Feedback sur la plateforme.",
+    "viewFullAdmin": "Administration complète",
     "stats": {
       "published": "Publiés",
       "drafts": "Brouillons",
@@ -111,6 +125,7 @@
     "noFeedback": "Aucun feedback pour le moment.",
     "message": "Message",
     "date": "Date",
+    "feedbackSummary": "{total} total · {week} (7 j)",
     "surveys": "Sondages",
     "rating": "Note",
     "page": "Page",

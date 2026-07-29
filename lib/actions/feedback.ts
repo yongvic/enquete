@@ -36,7 +36,35 @@ export async function submitFeedback(input: {
 
   revalidatePath("/fr/admin");
   revalidatePath("/en/admin");
+  revalidatePath("/fr/dashboard");
+  revalidatePath("/en/dashboard");
   return { success: true as const };
+}
+
+export async function getFeedbackOverview(locale: string) {
+  await requireSuperAdmin(locale);
+
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const [recent, total, weekCount] = await Promise.all([
+    prisma.feedback.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        message: true,
+        email: true,
+        rating: true,
+        page: true,
+        createdAt: true,
+      },
+    }),
+    prisma.feedback.count(),
+    prisma.feedback.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+  ]);
+
+  return { recent, total, weekCount };
 }
 
 export async function getRecentFeedback(locale: string) {
