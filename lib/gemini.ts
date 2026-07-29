@@ -1,10 +1,13 @@
 const DEFAULT_GEMINI_MODELS = [
+  "gemini-2.5-flash",
   "gemini-2.0-flash",
   "gemini-2.0-flash-lite",
+  "gemini-2.5-flash-lite",
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
-  "gemini-1.5-pro",
 ];
+
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 export function getGeminiApiKey(): string | undefined {
   return process.env.GEMINI_API_KEY?.trim() || undefined;
@@ -27,22 +30,40 @@ interface GeminiErrorBody {
   };
 }
 
-function isRetryableGeminiError(status: number, body: GeminiErrorBody): boolean {
-  if (status === 429 || status === 503) return true;
+function shouldTryNextModel(status: number, body: GeminiErrorBody): boolean {
+  if (status === 404 || status === 429 || status === 503) return true;
   const statusText = body.error?.status?.toUpperCase() || "";
   const message = (body.error?.message || "").toLowerCase();
   return (
+    statusText === "NOT_FOUND" ||
     statusText === "RESOURCE_EXHAUSTED" ||
     statusText === "UNAVAILABLE" ||
+    statusText === "INVALID_ARGUMENT" ||
+    message.includes("not found") ||
     message.includes("quota") ||
     message.includes("rate limit") ||
-    message.includes("resource exhausted")
+    message.includes("resource exhausted") ||
+    message.includes("no longer available") ||
+    message.includes("is not supported")
   );
 }
 
 export interface GeminiGenerateResult {
   text: string;
   modelUsed: string;
+}
+
+function extractText(body: {
+  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+}): string | null {
+  const parts = body.candidates?.[0]?.content?.parts;
+  if (!parts?.length) return null;
+  const text = parts
+    .map((p) => p.text)
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  return text || null;
 }
 
 export async function generateWithGeminiFallback(
@@ -58,12 +79,15 @@ export async function generateWithGeminiFallback(
   const errors: string[] = [];
 
   for (const model of models) {
-    const url = `https://generativeai.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const url = `${GEMINI_API_BASE}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemInstruction }] },
           contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -75,19 +99,24 @@ export async function generateWithGeminiFallback(
       });
 
       const body = (await res.json()) as GeminiErrorBody & {
-        candidates?: { content?: { parts?: { text?: string }[] } }[];
+        candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
       };
 
       if (!res.ok) {
-        const msg = body.error?.message || res.statusText;
+        const msg = body.error?.message || res.statusText || `HTTP ${res.status}`;
         errors.push(`${model}: ${msg}`);
-        if (isRetryableGeminiError(res.status, body)) continue;
-        throw new Error(msg);
+        if (shouldTryNextModel(res.status, body)) continue;
+        // Auth / permission errors: stop immediately
+        if (res.status === 400 || res.status === 401 || res.status === 403) {
+          throw new Error(msg);
+        }
+        continue;
       }
 
-      const text = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      const text = extractText(body);
       if (!text) {
-        errors.push(`${model}: empty response`);
+        const reason = body.candidates?.[0]?.finishReason || "empty response";
+        errors.push(`${model}: ${reason}`);
         continue;
       }
 
@@ -98,5 +127,5 @@ export async function generateWithGeminiFallback(
     }
   }
 
-  throw new Error(errors.join(" | ") || "ALL_GEMINI_MODELS_FAILED");
+  throw new Error(`ALL_GEMINI_MODELS_FAILED: ${errors.join(" | ") || "no models tried"}`);
 }

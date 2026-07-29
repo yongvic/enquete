@@ -30,15 +30,20 @@ export async function POST(
     return NextResponse.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
+    console.error("[ai-report]", message);
     if (message === "GEMINI_API_KEY_MISSING") {
       return NextResponse.json({ error: "apiKeyMissing" }, { status: 503 });
     }
     if (message === "NO_RESPONSES") {
       return NextResponse.json({ error: "noResponses" }, { status: 400 });
     }
-    if (message.includes("ALL_GEMINI_MODELS_FAILED") || message.includes("quota")) {
+    if (
+      message.includes("ALL_GEMINI_MODELS_FAILED") ||
+      message.toLowerCase().includes("quota") ||
+      message.toLowerCase().includes("resource_exhausted")
+    ) {
       return NextResponse.json({ error: "quotaExceeded" }, { status: 429 });
     }
-    return NextResponse.json({ error: "generationFailed", detail: message }, { status: 500 });
+    return NextResponse.json({ error: "generationFailed", detail: message.slice(0, 500) }, { status: 500 });
   }
 }
