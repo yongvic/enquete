@@ -293,13 +293,21 @@ body {
   max-width: 11rem !important;
 }
 
-.brand-logo--full.header-logo {
+.brand-logo--dark {
+  height: 2.25rem !important;
+  width: auto !important;
+  max-width: 11rem !important;
+}
+
+.brand-logo--full.header-logo,
+.brand-logo--dark.header-logo {
   height: 2rem !important;
-  max-width: 10rem !important;
+  max-width: 11rem !important;
 }
 
 @media (min-width: 640px) {
-  .brand-logo--full.header-logo {
+  .brand-logo--full.header-logo,
+  .brand-logo--dark.header-logo {
     height: 2.25rem !important;
     max-width: 11rem !important;
   }

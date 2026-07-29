@@ -15,7 +15,7 @@ export async function AuthShell({ children, mode }: AuthShellProps) {
       <LandingHeader showAuthLinks={false} />
       <div className="flex-1 flex items-stretch">
         <aside className="auth-shell__brand hidden lg:flex lg:w-[42%] xl:w-[45%] flex-col justify-between p-10 xl:p-14">
-          <BrandLogo variant="full" href="/" className="opacity-95" />
+          <BrandLogo variant="dark" href="/" className="opacity-95" />
           <div>
             <p className="auth-shell__tagline text-2xl xl:text-3xl font-bold leading-snug">
               {t("shellTagline")}

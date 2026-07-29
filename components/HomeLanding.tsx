@@ -53,7 +53,7 @@ export async function HomeLanding() {
             </div>
 
             <div className="landing-hero__visual hidden lg:flex items-center justify-center p-8 rounded-sm">
-              <BrandLogo variant="full" href="/" priority className="!h-auto !max-w-[320px]" />
+              <BrandLogo variant="dark" href="/" priority className="!h-auto !max-w-[320px]" />
             </div>
           </section>
 
