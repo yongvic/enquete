@@ -170,6 +170,8 @@
     "titlePlaceholder": "Survey title",
     "descriptionPlaceholder": "Description (optional)",
     "addQuestion": "Add a question",
+    "dragHint": "Drag questions with the ⋮⋮ handle to change their order.",
+    "dragHandle": "Move question",
     "publish": "Publish survey",
     "publishing": "Publishing…",
     "saveChanges": "Save changes",

@@ -170,6 +170,8 @@
     "titlePlaceholder": "Titre du sondage",
     "descriptionPlaceholder": "Description (facultatif)",
     "addQuestion": "Ajouter une question",
+    "dragHint": "Glissez les questions avec la poignée ⋮⋮ pour changer leur ordre.",
+    "dragHandle": "Déplacer la question",
     "publish": "Publier le sondage",
     "publishing": "Publication…",
     "saveChanges": "Enregistrer les modifications",

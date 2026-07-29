@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   Plus,
@@ -15,7 +15,26 @@ import {
   Save,
   Asterisk,
   BookOpen,
+  GripVertical,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "@/i18n/navigation";
 import { publishSurvey, saveDraft, updatePublishedSurvey } from "@/lib/actions/survey";
 import { loadEnqueteTemplateForUser } from "@/lib/actions/template";
@@ -84,6 +103,23 @@ export function SurveyWizard({
     setQuestions((qs) => qs.map((q) => (q.id === id ? { ...q, ...patch } : q)));
   const removeQ = (id: string) => setQuestions((qs) => qs.filter((q) => q.id !== id));
   const addQ = () => setQuestions((qs) => [...qs, emptyQuestion()]);
+  const moveQ = (from: number, to: number) =>
+    setQuestions((qs) => arrayMove(qs, from, to));
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = questions.findIndex((q) => q.id === active.id);
+    const newIndex = questions.findIndex((q) => q.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    moveQ(oldIndex, newIndex);
+  };
 
   const validate = () => {
     if (!title.trim()) return tc("errors.title");
@@ -335,17 +371,26 @@ export function SurveyWizard({
       )}
 
       {step === "questions" && (
-        <div className="flex flex-col gap-6">
-          {questions.map((q, i) => (
-            <QuestionEditor
-              key={q.id}
-              index={i}
-              q={q}
-              onChange={(patch) => updateQ(q.id, patch)}
-              onRemove={() => removeQ(q.id)}
-              canRemove={questions.length > 1}
-            />
-          ))}
+        <div className="flex flex-col gap-4">
+          <p className="sondage-sans text-xs" style={{ color: SLATE }}>
+            {tc("dragHint")}
+          </p>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
+              <div className="flex flex-col gap-4">
+                {questions.map((q, i) => (
+                  <SortableQuestionEditor
+                    key={q.id}
+                    index={i}
+                    q={q}
+                    onChange={(patch) => updateQ(q.id, patch)}
+                    onRemove={() => removeQ(q.id)}
+                    canRemove={questions.length > 1}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
           <button
             onClick={addQ}
             className="sondage-btn sondage-sans flex items-center gap-2 text-sm self-start"
@@ -470,7 +515,7 @@ export function SurveyWizard({
   );
 }
 
-function QuestionEditor({
+function SortableQuestionEditor({
   index,
   q,
   onChange,
@@ -483,22 +528,79 @@ function QuestionEditor({
   onRemove: () => void;
   canRemove: boolean;
 }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: q.id,
+  });
+  const tc = useTranslations("create");
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.88 : 1,
+    zIndex: isDragging ? 20 : undefined,
+    boxShadow: isDragging ? `0 10px 28px ${INK}22` : undefined,
+    background: isDragging ? "#fff" : undefined,
+    borderRadius: isDragging ? 6 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <QuestionEditor
+        index={index}
+        q={q}
+        onChange={onChange}
+        onRemove={onRemove}
+        canRemove={canRemove}
+        dragHandle={
+          <button
+            type="button"
+            className="sondage-btn p-2 touch-none cursor-grab active:cursor-grabbing"
+            style={{ color: SLATE, border: `1px solid ${SLATE}44`, borderRadius: 6 }}
+            aria-label={tc("dragHandle")}
+            title={tc("dragHandle")}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical size={16} />
+          </button>
+        }
+      />
+    </div>
+  );
+}
+
+function QuestionEditor({
+  index,
+  q,
+  onChange,
+  onRemove,
+  canRemove,
+  dragHandle,
+}: {
+  index: number;
+  q: Question;
+  onChange: (patch: Partial<Question>) => void;
+  onRemove: () => void;
+  canRemove: boolean;
+  dragHandle?: ReactNode;
+}) {
   const tc = useTranslations("create");
 
   return (
-    <div style={{ borderLeft: `3px solid ${INK}` }} className="pl-4">
-      <div className="flex items-start justify-between gap-3">
-        <span className="sondage-mono text-xs pt-2" style={{ color: SLATE }}>
+    <div style={{ borderLeft: `3px solid ${INK}` }} className="pl-3 sm:pl-4">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        {dragHandle}
+        <span className="sondage-mono text-xs pt-2 shrink-0" style={{ color: SLATE }}>
           {tc("questionLabel", { index: index + 1 })}
         </span>
         <input
-          className="sondage-input flex-1"
+          className="sondage-input flex-1 min-w-0"
           placeholder={tc("questionPlaceholder")}
           value={q.text}
           onChange={(e) => onChange({ text: e.target.value })}
         />
         {canRemove && (
-          <button onClick={onRemove} className="sondage-btn pt-2" style={{ color: SLATE }}>
+          <button onClick={onRemove} className="sondage-btn pt-2 shrink-0" style={{ color: SLATE }}>
             <Trash2 size={16} />
           </button>
         )}
