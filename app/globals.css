@@ -163,9 +163,159 @@ body {
 }
 
 .app-header {
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid color-mix(in srgb, var(--slate) 28%, transparent);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--slate) 22%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+@media (min-width: 1024px) {
+  .app-header {
+    border-bottom-color: color-mix(in srgb, var(--slate) 18%, transparent);
+  }
+
+  .navbar__inner {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .navbar__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1.5rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .navbar__brand {
+    justify-self: start;
+  }
+
+  .navbar__center {
+    justify-self: center;
+  }
+
+  .navbar__actions {
+    justify-self: end;
+  }
+
+  .navbar__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.72);
+    border: 1px solid color-mix(in srgb, var(--slate) 28%, transparent);
+    box-shadow:
+      0 1px 2px rgb(30 42 56 / 0.04),
+      inset 0 1px 0 rgb(255 255 255 / 0.9);
+  }
+
+  .navbar__pill-divider {
+    width: 1px;
+    height: 1.25rem;
+    background: color-mix(in srgb, var(--slate) 30%, transparent);
+    margin-inline: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .navbar-desktop-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--ink) 62%, var(--slate));
+    transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .navbar-desktop-link:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--slate) 10%, transparent);
+  }
+
+  .navbar-desktop-link--active {
+    color: var(--ink);
+    background: #fff;
+    box-shadow:
+      0 1px 3px rgb(30 42 56 / 0.08),
+      inset 0 0 0 1px color-mix(in srgb, var(--slate) 18%, transparent);
+  }
+
+  .navbar-desktop-link--accent {
+    color: var(--ochre);
+  }
+
+  .navbar-desktop-link--accent.navbar-desktop-link--active {
+    color: var(--ochre);
+    background: color-mix(in srgb, var(--ochre) 10%, #fff);
+    box-shadow:
+      0 1px 3px color-mix(in srgb, var(--ochre) 15%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--ochre) 35%, transparent);
+  }
+
+  .navbar-desktop-link__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.88;
+  }
+
+  .navbar-desktop-link--active .navbar-desktop-link__icon {
+    color: var(--ochre);
+    opacity: 1;
+  }
+
+  .navbar-desktop__locale .sondage-btn {
+    min-height: 2.25rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.72);
+    border: 1px solid color-mix(in srgb, var(--slate) 28%, transparent) !important;
+    color: var(--slate) !important;
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+  }
+
+  .navbar-desktop-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.35rem;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: transform 0.12s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .navbar-desktop-btn--ghost {
+    color: color-mix(in srgb, var(--ink) 70%, var(--slate));
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--slate) 32%, transparent);
+  }
+
+  .navbar-desktop-btn--ghost:hover {
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  .navbar-desktop-btn--primary {
+    color: #fff;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ochre) 92%, #fff) 0%, var(--ochre) 100%);
+    border: 1px solid color-mix(in srgb, var(--ochre) 80%, var(--ink));
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--ochre) 28%, transparent);
+  }
+
+  .navbar-desktop-btn--primary:hover {
+    opacity: 0.94;
+    transform: translateY(-1px);
+  }
 }
 
 .landing-hero__subtitle {
@@ -344,6 +494,11 @@ body {
   .landing-header,
   .app-header,
   .navbar {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar__inner {
     padding-left: 0.875rem;
     padding-right: 0.875rem;
   }

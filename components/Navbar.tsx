@@ -19,7 +19,7 @@ import {
 import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 import { Role } from "@prisma/client";
-import { INK, OCHRE, SLATE } from "@/lib/constants";
+import { SLATE } from "@/lib/constants";
 import { isSuperAdmin } from "@/lib/roles";
 import { BrandLogo } from "./BrandLogo";
 import { LocaleSwitcher } from "./LocaleSwitcher";
@@ -44,20 +44,18 @@ interface NavbarProps {
 }
 
 function DesktopNavLink({ item, active }: { item: NavItem; active: boolean }) {
-  const style: React.CSSProperties = item.accent
-    ? { color: OCHRE }
-    : active
-      ? { color: INK, background: `${SLATE}18`, fontWeight: 600 }
-      : { color: SLATE };
+  const className = [
+    "navbar-desktop-link sondage-btn sondage-sans",
+    active ? "navbar-desktop-link--active" : "",
+    item.accent ? "navbar-desktop-link--accent" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <Link
-      href={item.href}
-      className="navbar-link sondage-btn sondage-sans text-sm font-medium flex items-center gap-2 px-3.5 py-2 rounded-md transition-colors"
-      style={style}
-    >
-      {item.icon}
-      {item.label}
+    <Link href={item.href} className={className}>
+      {item.icon && <span className="navbar-desktop-link__icon">{item.icon}</span>}
+      <span className="navbar-desktop-link__label">{item.label}</span>
     </Link>
   );
 }
@@ -175,6 +173,10 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
       mobileMain.push(adminItem);
     }
   } else {
+    desktopItems.push(
+      { href: "/", label: t("nav.home"), icon: <Home size={16} strokeWidth={2} /> },
+      { href: "/repondre", label: t("nav.answer"), icon: <MessageSquareReply size={16} strokeWidth={2} /> },
+    );
     mobileMain.push(
       { href: "/", label: t("nav.home"), description: t("nav.homeDesc"), icon: <Home size={20} /> },
       { href: "/repondre", label: t("nav.answer"), description: t("nav.answerDesc"), icon: <MessageSquareReply size={20} /> },
@@ -284,58 +286,57 @@ export function Navbar({ isLoggedIn, role, compactAuth = false, logoHref, priori
 
   return (
     <>
-    <header className="navbar app-header sticky top-0 z-30 px-4 sm:px-8 py-3 sm:py-4">
-      <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 min-w-0">
-        <div className="min-w-0 shrink">
-          <BrandLogo variant="full" href={logoTarget} priority={priority} className="header-logo" />
-        </div>
-
-        {desktopItems.length > 0 && (
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center" aria-label={t("nav.main")}>
-            {desktopItems.map((item) => (
-              <DesktopNavLink key={item.href + item.label} item={item} active={isActive(item.href)} />
-            ))}
-          </nav>
-        )}
-
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden lg:block">
-            <LocaleSwitcher />
+    <header className="navbar app-header sticky top-0 z-30">
+      <div className="navbar__inner max-w-5xl mx-auto px-4 sm:px-8">
+        <div className="navbar__row flex items-center justify-between gap-4 min-w-0 py-3 sm:py-3.5">
+          <div className="navbar__brand min-w-0 shrink">
+            <BrandLogo variant="full" href={logoTarget} priority={priority} className="header-logo" />
           </div>
 
-          {!isLoggedIn && !compactAuth && (
-            <div className="hidden lg:flex items-center gap-2">
-              <Link
-                href="/connexion"
-                className="navbar-link sondage-btn sondage-sans text-sm font-medium px-3 py-2"
-                style={{ color: SLATE }}
-              >
-                {t("login")}
-              </Link>
-              <Link
-                href="/inscription"
-                className="navbar-link sondage-btn sondage-sans text-sm font-semibold px-4 py-2 text-white"
-                style={{ background: OCHRE }}
-              >
-                {t("register")}
-              </Link>
-            </div>
+          {desktopItems.length > 0 && (
+            <nav className="navbar__center hidden lg:flex flex-1 justify-center" aria-label={t("nav.main")}>
+              <div className="navbar__pill">
+                {desktopItems.map((item, index) => (
+                  <span key={item.href + item.label} className="navbar__pill-item flex items-center">
+                    {index > 0 && <span className="navbar__pill-divider" aria-hidden />}
+                    <DesktopNavLink item={item} active={isActive(item.href)} />
+                  </span>
+                ))}
+              </div>
+            </nav>
           )}
 
-          {isLoggedIn && (
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: window.location.origin })}
-              className="navbar-link sondage-btn sondage-sans text-[11px] tracking-wide uppercase px-3 hidden lg:inline-flex"
-              style={{ color: SLATE }}
-            >
-              {t("logout")}
-            </button>
-          )}
+          <div className="navbar__actions hidden lg:flex items-center gap-2 shrink-0">
+            <div className="navbar-desktop__locale">
+              <LocaleSwitcher />
+            </div>
+
+            {!isLoggedIn && !compactAuth && (
+              <>
+                <Link href="/connexion" className="navbar-desktop-btn navbar-desktop-btn--ghost sondage-btn sondage-sans">
+                  {t("login")}
+                </Link>
+                <Link href="/inscription" className="navbar-desktop-btn navbar-desktop-btn--primary sondage-btn sondage-sans">
+                  {t("register")}
+                </Link>
+              </>
+            )}
+
+            {isLoggedIn && (
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: window.location.origin })}
+                className="navbar-desktop-btn navbar-desktop-btn--ghost sondage-btn sondage-sans flex items-center gap-1.5"
+              >
+                <LogOut size={15} strokeWidth={2} />
+                {t("logout")}
+              </button>
+            )}
+          </div>
 
           <button
             type="button"
-            className={`navbar-menu-btn sondage-btn flex lg:hidden items-center justify-center w-11 h-11 ${open ? "navbar-menu-btn--open" : ""}`}
+            className={`navbar-menu-btn sondage-btn flex lg:hidden items-center justify-center w-11 h-11 shrink-0 ${open ? "navbar-menu-btn--open" : ""}`}
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? t("nav.closeMenu") : t("nav.menu")}
