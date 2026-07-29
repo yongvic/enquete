@@ -17,6 +17,14 @@ interface AdminStatsProps {
     createdAt: Date;
     _count: { surveys: number };
   }[];
+  recentFeedback: {
+    id: string;
+    message: string;
+    email: string | null;
+    rating: number | null;
+    page: string | null;
+    createdAt: Date;
+  }[];
   labels: {
     title: string;
     subtitle: string;
@@ -27,12 +35,15 @@ interface AdminStatsProps {
     totalResponses: string;
     responsesWeek: string;
     recentUsers: string;
+    recentFeedback: string;
     surveys: string;
     privacyNote: string;
+    rating: string;
+    page: string;
   };
 }
 
-export function AdminStats({ stats, recentUsers, labels }: AdminStatsProps) {
+export function AdminStats({ stats, recentUsers, recentFeedback, labels }: AdminStatsProps) {
   const cards = [
     { label: labels.totalUsers, value: stats.totalUsers },
     { label: labels.newUsersWeek, value: stats.newUsersWeek },
@@ -88,6 +99,29 @@ export function AdminStats({ stats, recentUsers, labels }: AdminStatsProps) {
           </table>
         </div>
       </section>
+
+      {recentFeedback.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-bold text-lg">{labels.recentFeedback}</h2>
+          <div className="mt-4 flex flex-col gap-3">
+            {recentFeedback.map((f) => (
+              <div key={f.id} className="p-4" style={{ border: `1px solid ${SLATE}44` }}>
+                <p className="sondage-sans text-sm whitespace-pre-wrap">{f.message}</p>
+                <div className="sondage-sans text-xs mt-2 flex flex-wrap gap-x-3 gap-y-1" style={{ color: SLATE }}>
+                  {f.rating != null && (
+                    <span>
+                      {labels.rating}: {f.rating}/5
+                    </span>
+                  )}
+                  {f.email && <span>{f.email}</span>}
+                  {f.page && <span>{labels.page}: {f.page}</span>}
+                  <span>{new Date(f.createdAt).toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <p className="sondage-sans text-xs mt-10 py-3 px-3" style={{ background: `${SLATE}18`, color: `${INK}bb` }}>
         {labels.privacyNote}

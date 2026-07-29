@@ -23,9 +23,6 @@ export async function HomeLanding() {
           {/* Hero */}
           <section className="landing-hero__main grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div>
-              <div className="lg:hidden mb-6">
-                <BrandLogo variant="full" href="/" priority />
-              </div>
               <p className="sondage-mono text-[11px] tracking-[0.2em] uppercase mb-4" style={{ color: OCHRE }}>
                 {t("eyebrow")}
               </p>

@@ -1,5 +1,6 @@
 import { getSiteConfig } from "@/lib/site";
 import { SiteFooter } from "./SiteFooter";
+import { FeedbackWidget } from "./FeedbackWidget";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const site = getSiteConfig();
@@ -13,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         linkedinUrl={site.linkedinUrl || undefined}
         githubUrl={site.githubUrl || undefined}
       />
+      <FeedbackWidget />
     </div>
   );
 }

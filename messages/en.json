@@ -13,7 +13,15 @@
     "superadmin": "Superadmin",
     "logout": "Sign out",
     "login": "Sign in",
-    "register": "Create account"
+    "register": "Create account",
+    "nav": {
+      "main": "Main navigation",
+      "menu": "Menu",
+      "closeMenu": "Close menu",
+      "home": "Home",
+      "answer": "Answer",
+      "create": "Create survey"
+    }
   },
   "home": {
     "eyebrow": "Data collection & analysis",
@@ -97,7 +105,10 @@
     "totalResponses": "Total responses",
     "responsesWeek": "Responses (7d)",
     "recentUsers": "Recent users",
+    "recentFeedback": "Recent feedback",
     "surveys": "Surveys",
+    "rating": "Rating",
+    "page": "Page",
     "privacyNote": "As superadmin, you see aggregated metrics and account list, but not individual response content."
   },
   "wizard": {
@@ -109,7 +120,7 @@
     "templateDesc": "Pre-filled coxarthrosis survey (24 questions)",
     "templateForbidden": "This template is not available for your account.",
     "guideTitle": "Creation guide",
-    "guideIntro": "The CNAO template is reserved for specific use. You can create your own survey by following these steps:",
+    "guideIntro": "Create your survey by following these steps:",
     "guideStep1": "Choose « Blank survey » to start the step-by-step wizard.",
     "guideStep2": "Enter a title and description to give context to your survey.",
     "guideStep3": "Add your questions (single choice, multiple choice, rating, number, or free text).",
@@ -201,7 +212,24 @@
   },
   "footer": {
     "madeBy": "Platform built by",
-    "tagline": "Surveys · CNAO · Open source"
+    "tagline": "Surveys · Open source"
+  },
+  "feedback": {
+    "open": "Feedback",
+    "title": "Your feedback matters",
+    "subtitle": "Report a bug, suggest an improvement, or share your experience.",
+    "rating": "Overall rating (optional)",
+    "message": "Your message",
+    "messagePlaceholder": "Describe your feedback…",
+    "email": "Email (optional)",
+    "emailPlaceholder": "So we can follow up",
+    "submit": "Send",
+    "thanks": "Thank you! Your feedback has been recorded.",
+    "close": "Close",
+    "errors": {
+      "tooShort": "Message must be at least 5 characters.",
+      "failed": "Could not send. Please try again."
+    }
   },
   "results": {
     "title": "Results",

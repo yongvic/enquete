@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { AppHeader } from "@/components/AppHeader";
 import { AnswerSurveyForm } from "@/components/AnswerSurveyForm";
 import { setRequestLocale } from "next-intl/server";
 
@@ -12,7 +12,7 @@ export default async function AnswerByCodePage({
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="sondage-page">
         <AnswerSurveyForm initialCode={code} />
       </div>

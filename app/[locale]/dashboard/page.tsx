@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { AppHeader } from "@/components/AppHeader";
 import { UserDashboard } from "@/components/UserDashboard";
 import { getMySurveys } from "@/lib/actions/survey";
 import { requireAuth } from "@/lib/session";
@@ -13,7 +13,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
 
   return (
     <>
-      <Header isLoggedIn role={session.user.role} />
+      <AppHeader />
       <div className="sondage-page max-w-3xl">
         <UserDashboard
           published={published}

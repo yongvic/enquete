@@ -93,3 +93,15 @@ model Response {
 
   @@index([surveyId])
 }
+
+model Feedback {
+  id        String   @id @default(cuid())
+  message   String   @db.Text
+  email     String?
+  rating    Int?
+  page      String?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

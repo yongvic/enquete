@@ -1,5 +1,5 @@
 import { SurveyStatus } from "@prisma/client";
-import { Header } from "@/components/Header";
+import { AppHeader } from "@/components/AppHeader";
 import { SharePanel } from "@/components/SharePanel";
 import { requireAuth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -26,7 +26,7 @@ export default async function PublishedPage({
 
   return (
     <>
-      <Header isLoggedIn role={session.user.role} />
+      <AppHeader />
       <div className="sondage-page">
         <SharePanel code={survey.code} />
       </div>

@@ -31,10 +31,7 @@ export async function AuthShell({ children, mode }: AuthShellProps) {
           </ul>
         </aside>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
-          <div className="lg:hidden mb-8">
-            <BrandLogo variant="icon" href="/" />
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 py-6 sm:py-12">
           <div className="auth-card w-full max-w-md p-6 sm:p-8">
             <h1 className="text-2xl sm:text-[1.65rem] font-bold tracking-tight">
               {mode === "login" ? t("loginTitle") : t("registerTitle")}

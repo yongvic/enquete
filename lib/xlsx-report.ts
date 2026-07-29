@@ -21,7 +21,7 @@ export async function buildSurveyXlsx(
   responses: SurveyResponse[]
 ): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Enquête CNAO";
+  wb.creator = "Enquête Sondage";
   wb.created = new Date();
 
   // --- Feuille Synthèse ---

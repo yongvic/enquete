@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { AppHeader } from "@/components/AppHeader";
 import { SurveyWizard } from "@/components/SurveyWizard";
 import { getDraft, getMyDrafts, getPublishedSurveyForEdit } from "@/lib/actions/survey";
 import { requireAuth } from "@/lib/session";
@@ -24,7 +24,7 @@ export default async function CreatePage({
 
   return (
     <>
-      <Header isLoggedIn role={session.user.role} />
+      <AppHeader />
       <div className="sondage-page">
         <SurveyWizard
           drafts={drafts}

@@ -13,7 +13,15 @@
     "superadmin": "Superadmin",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "register": "Créer un compte"
+    "register": "Créer un compte",
+    "nav": {
+      "main": "Navigation principale",
+      "menu": "Menu",
+      "closeMenu": "Fermer le menu",
+      "home": "Accueil",
+      "answer": "Répondre",
+      "create": "Créer un sondage"
+    }
   },
   "home": {
     "eyebrow": "Collecte & analyse de données",
@@ -97,7 +105,10 @@
     "totalResponses": "Réponses totales",
     "responsesWeek": "Réponses (7 j)",
     "recentUsers": "Utilisateurs récents",
+    "recentFeedback": "Feedbacks récents",
     "surveys": "Sondages",
+    "rating": "Note",
+    "page": "Page",
     "privacyNote": "En tant que superadmin, vous voyez les métriques agrégées et la liste des comptes, mais pas le contenu des réponses individuelles."
   },
   "wizard": {
@@ -109,7 +120,7 @@
     "templateDesc": "Enquête coxarthrose pré-remplie (24 questions)",
     "templateForbidden": "Ce modèle n'est pas disponible pour votre compte.",
     "guideTitle": "Guide de création",
-    "guideIntro": "Le modèle CNAO est réservé à un usage spécifique. Vous pouvez créer votre propre sondage en suivant ces étapes :",
+    "guideIntro": "Créez votre sondage en suivant ces étapes :",
     "guideStep1": "Choisissez « Sondage vierge » pour démarrer l'assistant pas à pas.",
     "guideStep2": "Renseignez le titre et une description pour contextualiser l'enquête.",
     "guideStep3": "Ajoutez vos questions (choix unique, multiple, note, nombre ou texte libre).",
@@ -201,7 +212,24 @@
   },
   "footer": {
     "madeBy": "Plateforme conçue par",
-    "tagline": "Sondages · CNAO · Open source"
+    "tagline": "Sondages · Open source"
+  },
+  "feedback": {
+    "open": "Feedback",
+    "title": "Votre avis compte",
+    "subtitle": "Signalez un bug, proposez une amélioration ou partagez votre expérience.",
+    "rating": "Note globale (optionnel)",
+    "message": "Votre message",
+    "messagePlaceholder": "Décrivez votre retour…",
+    "email": "Email (optionnel)",
+    "emailPlaceholder": "Pour vous recontacter",
+    "submit": "Envoyer",
+    "thanks": "Merci ! Votre feedback a bien été enregistré.",
+    "close": "Fermer",
+    "errors": {
+      "tooShort": "Le message doit contenir au moins 5 caractères.",
+      "failed": "Envoi impossible. Réessayez."
+    }
   },
   "results": {
     "title": "Résultats",
