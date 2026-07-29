@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { AppShell } from "@/components/AppShell";
 import { Providers } from "@/components/Providers";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -31,6 +32,7 @@ export default async function LocaleLayout({
             <AppShell>{children}</AppShell>
           </Providers>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
