@@ -7,10 +7,6 @@ export const metadata: Metadata = {
   },
   description:
     "Créez des sondages, collectez des réponses sans compte et analysez vos résultats avec graphiques, exports Excel/PDF et rapport IA.",
-  icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/icon.png", type: "image/png" }],
-  },
 };
 
 export const viewport: Viewport = {
