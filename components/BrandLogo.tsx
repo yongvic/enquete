@@ -20,8 +20,7 @@ export function BrandLogo({ variant = "full", href = "/", className = "", priori
       width={width}
       height={height}
       priority={priority}
-      className={className}
-      style={{ width: "auto", height: variant === "icon" ? 40 : 48, maxWidth: variant === "full" ? 220 : 40 }}
+      className={`brand-logo brand-logo--${variant}${className ? ` ${className}` : ""}`}
     />
   );
 

@@ -281,3 +281,32 @@ body {
 .auth-footer-link {
   color: color-mix(in srgb, var(--ink) 60%, transparent);
 }
+
+.brand-logo {
+  width: auto !important;
+  height: auto !important;
+}
+
+.brand-logo--full {
+  height: 2.25rem !important;
+  width: auto !important;
+  max-width: 11rem !important;
+}
+
+.brand-logo--full.header-logo {
+  height: 2rem !important;
+  max-width: 10rem !important;
+}
+
+@media (min-width: 640px) {
+  .brand-logo--full.header-logo {
+    height: 2.25rem !important;
+    max-width: 11rem !important;
+  }
+}
+
+.brand-logo--icon {
+  height: 2rem !important;
+  width: 2rem !important;
+  max-width: 2rem !important;
+}

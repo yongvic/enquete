@@ -21,7 +21,7 @@ export function Header({ isLoggedIn, role }: HeaderProps) {
   return (
     <div className="app-header px-4 sm:px-8 pt-4 sm:pt-5 pb-3 sm:pb-4 sticky top-0 z-20">
       <div className="flex items-center justify-between max-w-5xl mx-auto gap-2 sm:gap-3">
-        <BrandLogo variant={isLoggedIn ? "icon" : "full"} href={isLoggedIn ? "/dashboard" : "/"} />
+        <BrandLogo variant="full" href={isLoggedIn ? "/dashboard" : "/"} className="header-logo" />
 
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {isLoggedIn && (
