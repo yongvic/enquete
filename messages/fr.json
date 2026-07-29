@@ -275,19 +275,18 @@
     },
     "aiReport": {
       "title": "Rapport analytique IA",
-      "subtitle": "Synthèse rédigée par Gemini à partir de vos statistiques agrégées (sans données nominatives).",
+      "subtitle": "Synthèse rédigée par IA à partir de vos statistiques agrégées (sans données nominatives).",
       "generate": "Générer le rapport",
       "regenerate": "Régénérer",
       "generating": "Analyse en cours…",
-      "modelUsed": "Modèle : {model}",
       "copy": "Copier",
       "copied": "Copié",
       "downloadPdf": "Télécharger PDF",
       "disclaimer": "Rapport généré par intelligence artificielle — à vérifier avant toute utilisation académique. Les chiffres officiels restent ceux des graphiques et exports.",
       "errors": {
-        "apiKeyMissing": "Clé API Gemini non configurée sur le serveur.",
+        "apiKeyMissing": "Le rapport IA n'est pas disponible pour le moment.",
         "noResponses": "Aucune réponse à analyser.",
-        "quotaExceeded": "Quota Gemini épuisé sur tous les modèles configurés. Réessayez plus tard.",
+        "quotaExceeded": "Limite de génération atteinte. Réessayez plus tard.",
         "generationFailed": "Impossible de générer le rapport. Réessayez.",
         "unauthorized": "Accès refusé."
       }

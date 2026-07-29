@@ -275,19 +275,18 @@
     },
     "aiReport": {
       "title": "AI analytical report",
-      "subtitle": "Summary written by Gemini from your aggregated statistics (no personal data).",
+      "subtitle": "Summary written by AI from your aggregated statistics (no personal data).",
       "generate": "Generate report",
       "regenerate": "Regenerate",
       "generating": "Analyzing…",
-      "modelUsed": "Model: {model}",
       "copy": "Copy",
       "copied": "Copied",
       "downloadPdf": "Download PDF",
       "disclaimer": "AI-generated report — verify before any academic use. Official figures remain those in charts and exports.",
       "errors": {
-        "apiKeyMissing": "Gemini API key is not configured on the server.",
+        "apiKeyMissing": "AI report is not available at the moment.",
         "noResponses": "No responses to analyze.",
-        "quotaExceeded": "Gemini quota exhausted on all configured models. Try again later.",
+        "quotaExceeded": "Generation limit reached. Try again later.",
         "generationFailed": "Could not generate the report. Please try again.",
         "unauthorized": "Access denied."
       }
