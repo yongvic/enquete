@@ -8,6 +8,7 @@ import { getSurveyResults } from "@/lib/actions/survey";
 import { INK, RUST, SLATE, Question, SurveyData, SurveyResponse } from "@/lib/constants";
 import { computeQuestionStats } from "@/lib/stats";
 import { ResultsChart } from "./ResultsChart";
+import { AiReportPanel } from "./AiReportPanel";
 
 type ViewMode = "simple" | "chart";
 
@@ -139,11 +140,14 @@ export function ResultsView({ initialCode }: ResultsViewProps) {
           {t("noResponses", { code: survey.code })}
         </div>
       ) : (
-        <div className="flex flex-col gap-9 mt-8">
+        <>
+          <AiReportPanel surveyCode={survey.code} responseCount={responses.length} />
+          <div className="flex flex-col gap-9 mt-8">
           {survey.questions.map((q, i) => (
             <QuestionResult key={q.id} q={q} index={i} responses={responses} viewMode={viewMode} />
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       <Link

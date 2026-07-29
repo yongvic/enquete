@@ -199,6 +199,25 @@
       "notFound": "Sondage introuvable.",
       "invalid": "Ce sondage est illisible.",
       "unauthorized": "Accès refusé — seul le créateur peut voir ces résultats."
+    },
+    "aiReport": {
+      "title": "Rapport analytique IA",
+      "subtitle": "Synthèse rédigée par Gemini à partir de vos statistiques agrégées (sans données nominatives).",
+      "generate": "Générer le rapport",
+      "regenerate": "Régénérer",
+      "generating": "Analyse en cours…",
+      "modelUsed": "Modèle : {model}",
+      "copy": "Copier",
+      "copied": "Copié",
+      "downloadPdf": "Télécharger PDF",
+      "disclaimer": "Rapport généré par intelligence artificielle — à vérifier avant toute utilisation académique. Les chiffres officiels restent ceux des graphiques et exports.",
+      "errors": {
+        "apiKeyMissing": "Clé API Gemini non configurée sur le serveur.",
+        "noResponses": "Aucune réponse à analyser.",
+        "quotaExceeded": "Quota Gemini épuisé sur tous les modèles configurés. Réessayez plus tard.",
+        "generationFailed": "Impossible de générer le rapport. Réessayez.",
+        "unauthorized": "Accès refusé."
+      }
     }
   }
 }
