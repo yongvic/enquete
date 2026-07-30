@@ -30,6 +30,8 @@ interface GeminiErrorBody {
   };
 }
 
+type GeminiPart = { text?: string; thought?: boolean };
+
 function shouldTryNextModel(status: number, body: GeminiErrorBody): boolean {
   if (status === 404 || status === 429 || status === 503) return true;
   const statusText = body.error?.status?.toUpperCase() || "";
@@ -44,21 +46,28 @@ function shouldTryNextModel(status: number, body: GeminiErrorBody): boolean {
     message.includes("rate limit") ||
     message.includes("resource exhausted") ||
     message.includes("no longer available") ||
-    message.includes("is not supported")
+    message.includes("is not supported") ||
+    message.includes("thinking_budget") ||
+    message.includes("thinkingconfig")
   );
 }
 
 export interface GeminiGenerateResult {
   text: string;
   modelUsed: string;
+  finishReason?: string;
+  truncated?: boolean;
 }
 
 function extractText(body: {
-  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+  candidates?: { content?: { parts?: GeminiPart[] }; finishReason?: string }[];
 }): string | null {
   const parts = body.candidates?.[0]?.content?.parts;
   if (!parts?.length) return null;
-  const text = parts
+  // Skip internal "thought" parts from Gemini 2.5+ thinking models
+  const visible = parts.filter((p) => !p.thought);
+  const source = visible.some((p) => p.text) ? visible : parts;
+  const text = source
     .map((p) => p.text)
     .filter(Boolean)
     .join("\n")
@@ -66,10 +75,20 @@ function extractText(body: {
   return text || null;
 }
 
+function isTruncated(finishReason?: string): boolean {
+  const reason = (finishReason || "").toUpperCase();
+  return reason === "MAX_TOKENS" || reason === "LENGTH";
+}
+
 export async function generateWithGeminiFallback(
   prompt: string,
   systemInstruction: string,
-  options?: { maxOutputTokens?: number; temperature?: number }
+  options?: {
+    maxOutputTokens?: number;
+    temperature?: number;
+    /** Disable model "thinking" so output tokens are not eaten by reasoning (Gemini 2.5+). */
+    thinkingBudget?: number;
+  }
 ): Promise<GeminiGenerateResult> {
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
@@ -80,11 +99,20 @@ export async function generateWithGeminiFallback(
   const errors: string[] = [];
   const maxOutputTokens = options?.maxOutputTokens ?? 8192;
   const temperature = options?.temperature ?? 0.35;
+  const thinkingBudget = options?.thinkingBudget ?? 0;
 
   for (const model of models) {
     const url = `${GEMINI_API_BASE}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-    try {
+    const attempt = async (withThinkingConfig: boolean) => {
+      const generationConfig: Record<string, unknown> = {
+        temperature,
+        maxOutputTokens,
+      };
+      if (withThinkingConfig) {
+        generationConfig.thinkingConfig = { thinkingBudget };
+      }
+
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -94,36 +122,53 @@ export async function generateWithGeminiFallback(
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemInstruction }] },
           contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature,
-            maxOutputTokens,
-          },
+          generationConfig,
         }),
       });
 
       const body = (await res.json()) as GeminiErrorBody & {
-        candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+        candidates?: { content?: { parts?: GeminiPart[] }; finishReason?: string }[];
       };
+
+      return { res, body };
+    };
+
+    try {
+      let { res, body } = await attempt(true);
+
+      // Older models / Pro variants may reject thinkingConfig — retry without it.
+      if (
+        !res.ok &&
+        (body.error?.status === "INVALID_ARGUMENT" ||
+          (body.error?.message || "").toLowerCase().includes("thinking"))
+      ) {
+        ({ res, body } = await attempt(false));
+      }
 
       if (!res.ok) {
         const msg = body.error?.message || res.statusText || `HTTP ${res.status}`;
         errors.push(`${model}: ${msg}`);
         if (shouldTryNextModel(res.status, body)) continue;
-        // Auth / permission errors: stop immediately
         if (res.status === 400 || res.status === 401 || res.status === 403) {
           throw new Error(msg);
         }
         continue;
       }
 
+      const finishReason = body.candidates?.[0]?.finishReason;
       const text = extractText(body);
       if (!text) {
-        const reason = body.candidates?.[0]?.finishReason || "empty response";
+        const reason = finishReason || "empty response";
         errors.push(`${model}: ${reason}`);
         continue;
       }
 
-      return { text, modelUsed: model };
+      return {
+        text,
+        modelUsed: model,
+        finishReason,
+        truncated: isTruncated(finishReason),
+      };
     } catch (err) {
       if (err instanceof Error && err.message === "GEMINI_API_KEY_MISSING") throw err;
       errors.push(`${model}: ${err instanceof Error ? err.message : "unknown error"}`);

@@ -51,7 +51,20 @@ export function makeSurveyCode(len = 5): string {
 }
 
 export function getAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL || process.env.AUTH_URL || "http://localhost:3000";
+  const candidates = [process.env.NEXT_PUBLIC_APP_URL, process.env.AUTH_URL, "http://localhost:3000"];
+  for (const raw of candidates) {
+    const value = (raw || "").trim().replace(/\/$/, "");
+    if (!value) continue;
+    try {
+      // Validates absolute URL (protocol + host)
+      // eslint-disable-next-line no-new
+      new URL(value);
+      return value;
+    } catch {
+      // ignore invalid env and try next candidate
+    }
+  }
+  return "http://localhost:3000";
 }
 
 export function getSurveyShareUrl(code: string, locale = "fr"): string {

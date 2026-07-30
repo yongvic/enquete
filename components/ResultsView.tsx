@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Loader2, AlertCircle, BarChart3, List } from "lucide-react";
+import { ArrowLeft, Loader2, AlertCircle, BarChart3, List, PieChart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getSurveyResults } from "@/lib/actions/survey";
 import { INK, RUST, SLATE, Question, SurveyData, SurveyResponse } from "@/lib/constants";
 import { computeQuestionStats } from "@/lib/stats";
-import { ResultsChart } from "./ResultsChart";
+import { ResultsChart, type ChartVariant } from "./ResultsChart";
+import { ResultsOverview } from "./ResultsOverview";
 import { AiReportPanel } from "./AiReportPanel";
 
-type ViewMode = "simple" | "chart";
+type ViewMode = "simple" | "bar" | "pie";
 
 interface ResultsViewProps {
   initialCode: string;
@@ -22,7 +23,7 @@ export function ResultsView({ initialCode }: ResultsViewProps) {
   const [responses, setResponses] = useState<SurveyResponse[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [viewMode, setViewMode] = useState<ViewMode>("chart");
+  const [viewMode, setViewMode] = useState<ViewMode>("bar");
 
   useEffect(() => {
     (async () => {
@@ -109,29 +110,27 @@ export function ResultsView({ initialCode }: ResultsViewProps) {
       </div>
 
       {responses.length > 0 && (
-        <div className="flex gap-2 mt-6">
-          <button
-            onClick={() => setViewMode("simple")}
-            className="sondage-btn sondage-sans text-xs px-3 py-1.5 flex items-center gap-1.5"
-            style={{
-              border: `1px solid ${viewMode === "simple" ? INK : SLATE + "66"}`,
-              background: viewMode === "simple" ? INK : "transparent",
-              color: viewMode === "simple" ? "#F7F5EF" : INK,
-            }}
-          >
-            <List size={14} /> {t("viewSimple")}
-          </button>
-          <button
-            onClick={() => setViewMode("chart")}
-            className="sondage-btn sondage-sans text-xs px-3 py-1.5 flex items-center gap-1.5"
-            style={{
-              border: `1px solid ${viewMode === "chart" ? INK : SLATE + "66"}`,
-              background: viewMode === "chart" ? INK : "transparent",
-              color: viewMode === "chart" ? "#F7F5EF" : INK,
-            }}
-          >
-            <BarChart3 size={14} /> {t("viewChart")}
-          </button>
+        <div className="flex gap-2 mt-6 flex-wrap">
+          {(
+            [
+              { mode: "simple" as const, icon: List, label: t("viewSimple") },
+              { mode: "bar" as const, icon: BarChart3, label: t("viewBar") },
+              { mode: "pie" as const, icon: PieChart, label: t("viewPie") },
+            ] as const
+          ).map(({ mode, icon: Icon, label }) => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className="sondage-btn sondage-sans text-xs px-3 py-2 sm:py-1.5 flex-1 sm:flex-none flex items-center justify-center gap-1.5 min-h-10 sm:min-h-0"
+              style={{
+                border: `1px solid ${viewMode === mode ? INK : SLATE + "66"}`,
+                background: viewMode === mode ? INK : "transparent",
+                color: viewMode === mode ? "#F7F5EF" : INK,
+              }}
+            >
+              <Icon size={14} /> {label}
+            </button>
+          ))}
         </div>
       )}
 
@@ -141,11 +140,19 @@ export function ResultsView({ initialCode }: ResultsViewProps) {
         </div>
       ) : (
         <>
+          <ResultsOverview
+            questions={survey.questions}
+            responses={responses}
+            chartVariant={viewMode === "pie" ? "pie" : "bar"}
+          />
           <AiReportPanel surveyCode={survey.code} responseCount={responses.length} />
-          <div className="flex flex-col gap-9 mt-8">
+          <div className="mt-10" style={{ borderTop: `1px solid ${SLATE}44`, paddingTop: 24 }}>
+            <h2 className="text-lg font-bold mb-6">{t("byQuestionTitle")}</h2>
+            <div className="flex flex-col gap-9">
           {survey.questions.map((q, i) => (
             <QuestionResult key={q.id} q={q} index={i} responses={responses} viewMode={viewMode} />
           ))}
+            </div>
           </div>
         </>
       )}
@@ -216,16 +223,20 @@ function QuestionResult({
               </span>
             )}
           </div>
-          {viewMode === "chart" ? (
-            <ResultsChart data={stats.data} />
-          ) : (
+          {viewMode === "simple" ? (
             <SimpleTable data={stats.data} />
+          ) : (
+            <ResultsChart data={stats.data} variant={viewMode as ChartVariant} />
           )}
         </>
       )}
 
       {(stats.type === "single" || stats.type === "multi") &&
-        (viewMode === "chart" ? <ResultsChart data={stats.data} /> : <SimpleTable data={stats.data} />)}
+        (viewMode === "simple" ? (
+          <SimpleTable data={stats.data} />
+        ) : (
+          <ResultsChart data={stats.data} variant={viewMode as ChartVariant} />
+        ))}
     </div>
   );
 }
@@ -236,9 +247,9 @@ function SimpleTable({ data }: { data: { name: string; value: number }[] }) {
     <div className="mt-3 flex flex-col gap-2">
       {data.map((row) => (
         <div key={row.name} className="sondage-sans text-sm">
-          <div className="flex justify-between mb-1">
-            <span>{row.name}</span>
-            <span className="sondage-mono">
+          <div className="flex justify-between gap-3 mb-1">
+            <span className="min-w-0 break-words">{row.name}</span>
+            <span className="sondage-mono shrink-0">
               {row.value} ({Math.round((row.value / total) * 100)}%)
             </span>
           </div>

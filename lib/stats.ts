@@ -5,6 +5,120 @@ export interface ChartDatum {
   value: number;
 }
 
+export interface TimelineDatum {
+  name: string;
+  value: number;
+  /** ISO date key YYYY-MM-DD for sorting */
+  key: string;
+}
+
+export interface CompletionDatum {
+  name: string;
+  value: number;
+  answered: number;
+  total: number;
+}
+
+export interface RatingOverviewDatum {
+  name: string;
+  value: number;
+  fullLabel: string;
+}
+
+function hasAnswer(value: unknown): boolean {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === "number") return !Number.isNaN(value);
+  return true;
+}
+
+function dayKey(date: Date | string): string {
+  const d = new Date(date);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatDayLabel(key: string, locale: string): string {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(locale === "en" ? "en-GB" : "fr-FR", {
+    day: "2-digit",
+    month: "short",
+  });
+}
+
+export function computeGlobalOverview(
+  questions: Question[],
+  responses: SurveyResponse[],
+  locale = "fr"
+) {
+  const total = responses.length;
+
+  const byDay = new Map<string, number>();
+  for (const r of responses) {
+    const key = dayKey(r.submittedAt);
+    byDay.set(key, (byDay.get(key) || 0) + 1);
+  }
+  const timeline: TimelineDatum[] = Array.from(byDay.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => ({
+      key,
+      name: formatDayLabel(key, locale),
+      value,
+    }));
+
+  const completion: CompletionDatum[] = questions.map((q, i) => {
+    const answered = responses.filter((r) => hasAnswer(r.answers?.[q.id])).length;
+    return {
+      name: `Q${i + 1}`,
+      value: total ? Math.round((answered / total) * 100) : 0,
+      answered,
+      total,
+    };
+  });
+
+  const avgCompletion =
+    completion.length > 0
+      ? Math.round(completion.reduce((s, c) => s + c.value, 0) / completion.length)
+      : 0;
+
+  const ratings: RatingOverviewDatum[] = [];
+  questions.forEach((q, i) => {
+    if (q.type !== "rating") return;
+    const stats = computeQuestionStats(q, responses);
+    if (stats.type !== "rating" || stats.avg === null) return;
+    ratings.push({
+      name: `Q${i + 1}`,
+      value: Math.round(stats.avg * 10) / 10,
+      fullLabel: q.text,
+    });
+  });
+
+  const leadingChoices: ChartDatum[] = [];
+  questions.forEach((q, i) => {
+    if (q.type !== "single") return;
+    const stats = computeQuestionStats(q, responses);
+    if (stats.type !== "single") return;
+    const top = [...stats.data].sort((a, b) => b.value - a.value)[0];
+    if (!top || top.value === 0) return;
+    leadingChoices.push({
+      name: `Q${i + 1} · ${top.name}`,
+      value: top.value,
+    });
+  });
+
+  return {
+    total,
+    timeline,
+    completion,
+    avgCompletion,
+    ratings,
+    leadingChoices,
+  };
+}
+
 export function computeQuestionStats(q: Question, responses: SurveyResponse[]) {
   if (q.type === "text") {
     const texts = responses

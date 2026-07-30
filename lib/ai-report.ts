@@ -175,14 +175,45 @@ export async function generateAiReport(
   const dataset = buildAiReportDataset(survey, questions, responses);
   const prompt = buildPrompt(dataset, locale);
   const result = await generateWithGeminiFallback(prompt, systemInstruction(locale), {
-    maxOutputTokens: 2048,
+    // Gemini 2.5 "thinking" shares this budget — keep it high and disable thinking below.
+    maxOutputTokens: 8192,
     temperature: 0.25,
+    thinkingBudget: 0,
   });
 
+  let report = normalizeAiReportMarkdown(result.text);
+  if (result.truncated) {
+    // Prefer a complete report: one retry with an even clearer "finish all sections" nudge.
+    try {
+      const retry = await generateWithGeminiFallback(
+        `${prompt}\n\nIMPORTANT: Finish ALL three sections completely. Do not stop mid-sentence.`,
+        systemInstruction(locale),
+        { maxOutputTokens: 8192, temperature: 0.2, thinkingBudget: 0 }
+      );
+      if (retry.text && !retry.truncated) {
+        report = normalizeAiReportMarkdown(retry.text);
+      } else if (retry.text && retry.text.length > report.length) {
+        report = normalizeAiReportMarkdown(retry.text);
+      }
+    } catch {
+      // keep first result
+    }
+  }
+
   return {
-    report: result.text,
+    report,
     responseCount: dataset.responseCount,
   };
+}
+
+/** Strip fences / normalize heading markers so the client renderer never drops a section. */
+export function normalizeAiReportMarkdown(raw: string): string {
+  let text = raw.replace(/\r\n/g, "\n").trim();
+  const fence = text.match(/^```(?:markdown|md)?\s*\n([\s\S]*?)\n```$/i);
+  if (fence) text = fence[1].trim();
+  // Ensure ATX headings are on their own line with a space after #
+  text = text.replace(/([^\n])(#{1,3}\s)/g, "$1\n$2");
+  return text.trim();
 }
 
 export async function saveAiReport(input: {
