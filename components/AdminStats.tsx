@@ -18,6 +18,7 @@ interface AdminStatsProps {
     email: string;
     role: string;
     createdAt: Date;
+    responseCount: number;
     _count: { surveys: number };
   }[];
   recentFeedback: FeedbackItem[];
@@ -39,6 +40,7 @@ interface AdminStatsProps {
     date: string;
     feedbackSummary: string;
     surveys: string;
+    responses: string;
     privacyNote: string;
     rating: string;
     page: string;
@@ -103,6 +105,7 @@ export function AdminStats({ stats, recentUsers, recentFeedback, labels }: Admin
                 <th className="text-left py-2 pr-4 font-semibold">Email</th>
                 <th className="text-left py-2 pr-4 font-semibold">Nom</th>
                 <th className="text-left py-2 pr-4 font-semibold">{labels.surveys}</th>
+                <th className="text-left py-2 pr-4 font-semibold">{labels.responses}</th>
                 <th className="text-left py-2 font-semibold">Rôle</th>
               </tr>
             </thead>
@@ -112,6 +115,7 @@ export function AdminStats({ stats, recentUsers, recentFeedback, labels }: Admin
                   <td className="py-2.5 pr-4">{u.email}</td>
                   <td className="py-2.5 pr-4">{u.name || "—"}</td>
                   <td className="py-2.5 pr-4 sondage-mono">{u._count.surveys}</td>
+                  <td className="py-2.5 pr-4 sondage-mono">{u.responseCount}</td>
                   <td className="py-2.5 sondage-mono text-xs">{u.role}</td>
                 </tr>
               ))}

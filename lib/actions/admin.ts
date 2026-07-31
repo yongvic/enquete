@@ -45,9 +45,8 @@ export async function getPlatformStats(locale: string) {
 export async function getRecentUsers(locale: string) {
   await requireSuperAdmin(locale);
 
-  return prisma.user.findMany({
+  const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    take: 10,
     select: {
       id: true,
       name: true,
@@ -55,6 +54,18 @@ export async function getRecentUsers(locale: string) {
       role: true,
       createdAt: true,
       _count: { select: { surveys: true } },
+      surveys: {
+        select: {
+          _count: { select: { responses: true } },
+        },
+      },
     },
   });
+
+  return users
+    .map(({ surveys, ...user }) => ({
+      ...user,
+      responseCount: surveys.reduce((sum, s) => sum + s._count.responses, 0),
+    }))
+    .sort((a, b) => b.responseCount - a.responseCount || b.createdAt.getTime() - a.createdAt.getTime());
 }

@@ -120,16 +120,17 @@
     "responsesWeek": "Réponses (7 j)",
     "totalFeedback": "Feedbacks",
     "feedbackWeek": "Feedbacks (7 j)",
-    "recentUsers": "Utilisateurs récents",
+    "recentUsers": "Utilisateurs",
     "recentFeedback": "Feedbacks utilisateurs",
     "noFeedback": "Aucun feedback pour le moment.",
     "message": "Message",
     "date": "Date",
     "feedbackSummary": "{total} total · {week} (7 j)",
     "surveys": "Sondages",
+    "responses": "Réponses",
     "rating": "Note",
     "page": "Page",
-    "privacyNote": "En tant que superadmin, vous voyez les métriques agrégées et la liste des comptes, mais pas le contenu des réponses individuelles."
+    "privacyNote": "En tant que superadmin, vous voyez les métriques agrégées, le nombre de réponses par compte, mais pas le contenu des réponses individuelles."
   },
   "wizard": {
     "startTitle": "Comment voulez-vous commencer ?",
