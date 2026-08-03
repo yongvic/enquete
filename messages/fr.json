@@ -171,6 +171,17 @@
     "titlePlaceholder": "Titre du sondage",
     "descriptionPlaceholder": "Description (facultatif)",
     "addQuestion": "Ajouter une question",
+    "addSection": "Ajouter une section",
+    "sectionLabel": "Section",
+    "sectionPlaceholder": "Titre de la section",
+    "sectionHint": "Les sections organisent le questionnaire. Elles n'attendent pas de réponse.",
+    "branchHint": "Sur un choix unique, utilisez « Aller à » pour diriger vers une autre question ou terminer le sondage selon la réponse.",
+    "goTo": "Aller à",
+    "goToNext": "Question suivante",
+    "goToEnd": "Fin du sondage",
+    "goToQuestion": "Q{index} — {text}",
+    "untitledQuestion": "Sans titre",
+    "previewBranchNote": "Branchements selon les réponses configurés.",
     "dragHint": "Glissez les questions avec la poignée ⋮⋮ pour changer leur ordre.",
     "dragHandle": "Déplacer la question",
     "publish": "Publier le sondage",
@@ -185,7 +196,8 @@
       "multi": "Choix multiple",
       "rating": "Note (1 à 5)",
       "number": "Nombre",
-      "text": "Réponse libre"
+      "text": "Réponse libre",
+      "section": "Section"
     },
     "ratingHint": "Les répondants noteront de 1 (faible) à 5 (élevé).",
     "textHint": "Réponse en texte libre.",
@@ -202,6 +214,7 @@
       "questions": "Ajoutez au moins une question.",
       "questionText": "Chaque question doit avoir un intitulé.",
       "options": "Chaque question à choix doit avoir au moins 2 options.",
+      "branchTarget": "Une destination de branchement pointe vers une question inexistante.",
       "publish": "Échec de la publication. Réessayez."
     }
   },
@@ -226,6 +239,8 @@
     "placeholder": "Votre réponse…",
     "required": "Importante",
     "optional": "Optionnelle",
+    "section": "Section",
+    "branchNote": "Certaines questions s'affichent selon vos réponses.",
     "errors": {
       "notFound": "Aucun sondage trouvé pour ce code.",
       "invalid": "Ce sondage est illisible.",
@@ -274,6 +289,7 @@
     "overviewResponsesAxis": "Réponses",
     "overviewAnswered": "Répondu",
     "byQuestionTitle": "Détail par question",
+    "sectionLabel": "Section",
     "average": "Moyenne",
     "minMax": "min {min} · max {max}",
     "noTextAnswers": "Pas encore de réponse.",

@@ -78,14 +78,24 @@ export function buildSurveyPdf(
       y = 20;
     }
 
+    const stats = computeQuestionStats(q, responses);
+
+    if (stats.type === "section") {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...INK_RGB);
+      const sec = doc.splitTextToSize(`Section — ${q.text}`, 180);
+      doc.text(sec, margin, y);
+      y += sec.length * 5 + 6;
+      continue;
+    }
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...INK_RGB);
     const qLabel = doc.splitTextToSize(`Q${i + 1}. ${q.text}`, 180);
     doc.text(qLabel, margin, y);
     y += qLabel.length * 5 + 3;
-
-    const stats = computeQuestionStats(q, responses);
 
     if (stats.type === "text") {
       doc.setFont("helvetica", "normal");

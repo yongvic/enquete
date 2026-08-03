@@ -34,7 +34,7 @@ export interface CrosstabRow {
 
 export function buildCrosstab(q: Question, responses: SurveyResponse[]): CrosstabRow[] {
   const stats = computeQuestionStats(q, responses);
-  if (stats.type === "text") return [];
+  if (stats.type === "text" || stats.type === "section") return [];
   const total = responses.length || 1;
   return stats.data.map((d) => ({
     option: d.name,
@@ -102,6 +102,7 @@ export function buildSummarySheetRows(questions: Question[], responses: SurveyRe
 
   questions.forEach((q, i) => {
     const stats = computeQuestionStats(q, responses);
+    if (stats.type === "section") return;
     if (stats.type === "text") {
       rows.push([`Q${i + 1}: ${q.text}`, "Texte", stats.texts.length, "—", "—", "—"]);
     } else if (stats.type === "number" || stats.type === "rating") {
@@ -123,10 +124,11 @@ export function buildSummarySheetRows(questions: Question[], responses: SurveyRe
 }
 
 export function rawResponseRows(questions: Question[], responses: SurveyResponse[]) {
-  const headers = ["Date", ...questions.map((q, i) => `Q${i + 1}: ${q.text}`)];
+  const cols = questions.filter((q) => q.type !== "section");
+  const headers = ["Date", ...cols.map((q, i) => `Q${i + 1}: ${q.text}`)];
   const rows = responses.map((r) => [
     new Date(r.submittedAt).toLocaleString("fr-FR"),
-    ...questions.map((q) => formatAnswer(r.answers[q.id])),
+    ...cols.map((q) => formatAnswer(r.answers[q.id])),
   ]);
   return { headers, rows };
 }

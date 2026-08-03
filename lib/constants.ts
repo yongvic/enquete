@@ -6,7 +6,10 @@ export const GREEN = "#4F7942";
 export const RUST = "#A63446";
 export const PALETTE = [INK, OCHRE, GREEN, RUST, SLATE, "#6B4C9A"];
 
-export type QuestionType = "single" | "multi" | "rating" | "number" | "text";
+export type QuestionType = "single" | "multi" | "rating" | "number" | "text" | "section";
+
+/** Branch target for a single-choice option: next question, end survey, or a question id. */
+export type BranchTarget = "next" | "end" | string;
 
 export interface Question {
   id: string;
@@ -14,6 +17,11 @@ export interface Question {
   text: string;
   required?: boolean;
   options?: string[];
+  /**
+   * Parallel to `options` (same length). Only used for `single`.
+   * `"next"` = continue in order, `"end"` = finish survey, otherwise jump to question id.
+   */
+  optionGoTo?: BranchTarget[];
   min?: number;
   max?: number;
   unit?: string;

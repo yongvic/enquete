@@ -182,6 +182,17 @@ function QuestionResult({
   const t = useTranslations("results");
   const stats = computeQuestionStats(q, responses);
 
+  if (stats.type === "section") {
+    return (
+      <div className="pt-2">
+        <div className="sondage-mono text-xs tracking-widest uppercase mb-1" style={{ color: SLATE }}>
+          {t("sectionLabel")}
+        </div>
+        <h3 className="font-bold text-base">{q.text}</h3>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="sondage-sans font-semibold text-[15px]">

@@ -36,59 +36,62 @@ export function buildAiReportDataset(
 ): AiReportDataset {
   const responseCount = responses.length;
 
-  const questionStats = questions.map((q, i) => {
-    const stats = computeQuestionStats(q, responses);
-    const base = {
-      index: i + 1,
-      text: q.text,
-      type: q.type,
-      required: !!q.required,
-    };
-
-    if (stats.type === "text") {
-      return {
-        ...base,
-        stats: {
-          kind: "text",
-          answerCount: stats.texts.length,
-          note: "Réponses texte libre non transmises (confidentialité).",
-        },
+  const questionStats = questions
+    .map((q, i) => {
+      const stats = computeQuestionStats(q, responses);
+      if (stats.type === "section") return null;
+      const base = {
+        index: i + 1,
+        text: q.text,
+        type: q.type,
+        required: !!q.required,
       };
-    }
 
-    if (stats.type === "number" || stats.type === "rating") {
-      const frequencies = stats.data.map((d) => ({
-        label: d.name,
-        count: d.value,
-        percent: responseCount ? Math.round((d.value / responseCount) * 1000) / 10 : 0,
+      if (stats.type === "text") {
+        return {
+          ...base,
+          stats: {
+            kind: "text",
+            answerCount: stats.texts.length,
+            note: "Réponses texte libre non transmises (confidentialité).",
+          },
+        };
+      }
+
+      if (stats.type === "number" || stats.type === "rating") {
+        const frequencies = stats.data.map((d) => ({
+          label: d.name,
+          count: d.value,
+          percent: responseCount ? Math.round((d.value / responseCount) * 1000) / 10 : 0,
+        }));
+        return {
+          ...base,
+          stats: {
+            kind: stats.type,
+            answeredCount: stats.count,
+            average: stats.avg !== null ? Math.round(stats.avg * 100) / 100 : null,
+            min: stats.type === "number" ? stats.min : null,
+            max: stats.type === "number" ? stats.max : null,
+            frequencies,
+          },
+        };
+      }
+
+      const frequencies = buildCrosstab(q, responses).map((row) => ({
+        option: row.option,
+        count: row.count,
+        percent: row.percent,
       }));
+
       return {
         ...base,
         stats: {
           kind: stats.type,
-          answeredCount: stats.count,
-          average: stats.avg !== null ? Math.round(stats.avg * 100) / 100 : null,
-          min: stats.type === "number" ? stats.min : null,
-          max: stats.type === "number" ? stats.max : null,
           frequencies,
         },
       };
-    }
-
-    const frequencies = buildCrosstab(q, responses).map((row) => ({
-      option: row.option,
-      count: row.count,
-      percent: row.percent,
-    }));
-
-    return {
-      ...base,
-      stats: {
-        kind: stats.type,
-        frequencies,
-      },
-    };
-  });
+    })
+    .filter(Boolean) as AiReportDataset["questions"];
 
   const crosstabs = getPairwiseCrosstabs(questions, responses)
     .slice(0, 4)

@@ -48,9 +48,10 @@ export async function registerAdmin(formData: FormData) {
 
 const questionSchema = z.object({
   id: z.string(),
-  type: z.enum(["single", "multi", "rating", "number", "text"]),
+  type: z.enum(["single", "multi", "rating", "number", "text", "section"]),
   text: z.string(),
   options: z.array(z.string()).optional(),
+  optionGoTo: z.array(z.string()).optional(),
   min: z.number().optional(),
   max: z.number().optional(),
   unit: z.string().optional(),
@@ -64,23 +65,55 @@ const surveyInputSchema = z.object({
 });
 
 function normalizeQuestions(questions: Question[]) {
-  return questions.map((q) => ({
-    ...q,
-    options:
-      q.type === "single" || q.type === "multi"
-        ? (q.options || []).filter((o) => o.trim())
-        : undefined,
-  }));
+  return questions.map((q) => {
+    if (q.type === "section") {
+      return {
+        id: q.id,
+        type: "section" as const,
+        text: q.text,
+        required: false,
+      };
+    }
+
+    if (q.type === "single" || q.type === "multi") {
+      const pairs = (q.options || [])
+        .map((label, i) => ({
+          label: label.trim(),
+          goTo: q.type === "single" ? q.optionGoTo?.[i] || "next" : undefined,
+        }))
+        .filter((p) => p.label);
+      return {
+        ...q,
+        required: q.required === true,
+        options: pairs.map((p) => p.label),
+        optionGoTo:
+          q.type === "single" && pairs.some((p) => p.goTo && p.goTo !== "next")
+            ? pairs.map((p) => p.goTo || "next")
+            : undefined,
+      };
+    }
+
+    const { optionGoTo: _omit, options: _opts, ...rest } = q;
+    return { ...rest, required: q.required === true, options: undefined, optionGoTo: undefined };
+  });
 }
 
 function validateSurveyInput(input: { title: string; description?: string; questions: Question[] }) {
   if (!input.title.trim()) return "title";
-  if (input.questions.length === 0) return "questions";
+  const answerable = input.questions.filter((q) => q.type !== "section");
+  if (answerable.length === 0) return "questions";
+  const ids = new Set(input.questions.map((q) => q.id));
   for (const q of input.questions) {
     if (!q.text.trim()) return "questionText";
     if (q.type === "single" || q.type === "multi") {
       const filled = (q.options || []).filter((o) => o.trim());
       if (filled.length < 2) return "options";
+    }
+    if (q.type === "single" && q.optionGoTo) {
+      for (const target of q.optionGoTo) {
+        if (!target || target === "next" || target === "end") continue;
+        if (!ids.has(target)) return "branchTarget";
+      }
     }
   }
   return null;
@@ -106,7 +139,7 @@ export async function saveDraft(input: {
   if (!session?.user?.id) return { error: "unauthorized" as const };
 
   const err = validateSurveyInput(input);
-  if (err) return { error: err as "title" | "questions" | "questionText" | "options" };
+  if (err) return { error: err as "title" | "questions" | "questionText" | "options" | "branchTarget" };
 
   const data = {
     title: input.title.trim(),
@@ -149,7 +182,7 @@ export async function publishSurvey(input: {
   if (!parsed.success) return { error: "invalid" as const };
 
   const err = validateSurveyInput(input);
-  if (err) return { error: err as "title" | "questions" | "questionText" | "options" };
+  if (err) return { error: err as "title" | "questions" | "questionText" | "options" | "branchTarget" };
 
   const questions = normalizeQuestions(parsed.data.questions);
   const code = await generateUniqueCode();
@@ -240,7 +273,7 @@ export async function updatePublishedSurvey(input: {
   if (!parsed.success) return { error: "invalid" as const };
 
   const err = validateSurveyInput(input);
-  if (err) return { error: err as "title" | "questions" | "questionText" | "options" };
+  if (err) return { error: err as "title" | "questions" | "questionText" | "options" | "branchTarget" };
 
   const survey = await prisma.survey.findFirst({
     where: { id: input.surveyId, userId: session.user.id, status: SurveyStatus.PUBLISHED },

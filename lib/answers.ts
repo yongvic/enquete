@@ -1,10 +1,12 @@
 import { Question } from "./constants";
+import { getMissingRequiredOnPath, isAnswerable } from "./branching";
 
 export function isQuestionRequired(q: Question): boolean {
-  return q.required === true;
+  return q.required === true && isAnswerable(q);
 }
 
 export function isAnswerFilled(q: Question, value: unknown): boolean {
+  if (!isAnswerable(q)) return true;
   if (value === undefined || value === null) return false;
   if (q.type === "multi") return Array.isArray(value) && value.length > 0;
   if (q.type === "text") return String(value).trim().length > 0;
@@ -16,5 +18,5 @@ export function getMissingRequiredQuestions(
   questions: Question[],
   answers: Record<string, unknown>
 ): Question[] {
-  return questions.filter((q) => isQuestionRequired(q) && !isAnswerFilled(q, answers[q.id]));
+  return getMissingRequiredOnPath(questions, answers);
 }

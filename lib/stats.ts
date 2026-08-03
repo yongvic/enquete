@@ -69,15 +69,18 @@ export function computeGlobalOverview(
       value,
     }));
 
-  const completion: CompletionDatum[] = questions.map((q, i) => {
-    const answered = responses.filter((r) => hasAnswer(r.answers?.[q.id])).length;
-    return {
-      name: `Q${i + 1}`,
-      value: total ? Math.round((answered / total) * 100) : 0,
-      answered,
-      total,
-    };
-  });
+  const completion: CompletionDatum[] = questions
+    .map((q, i) => ({ q, i }))
+    .filter(({ q }) => q.type !== "section")
+    .map(({ q, i }) => {
+      const answered = responses.filter((r) => hasAnswer(r.answers?.[q.id])).length;
+      return {
+        name: `Q${i + 1}`,
+        value: total ? Math.round((answered / total) * 100) : 0,
+        answered,
+        total,
+      };
+    });
 
   const avgCompletion =
     completion.length > 0
@@ -120,6 +123,10 @@ export function computeGlobalOverview(
 }
 
 export function computeQuestionStats(q: Question, responses: SurveyResponse[]) {
+  if (q.type === "section") {
+    return { type: "section" as const };
+  }
+
   if (q.type === "text") {
     const texts = responses
       .map((r) => r.answers?.[q.id])

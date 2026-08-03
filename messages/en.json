@@ -171,6 +171,17 @@
     "titlePlaceholder": "Survey title",
     "descriptionPlaceholder": "Description (optional)",
     "addQuestion": "Add a question",
+    "addSection": "Add a section",
+    "sectionLabel": "Section",
+    "sectionPlaceholder": "Section title",
+    "sectionHint": "Sections organize the questionnaire. They do not collect answers.",
+    "branchHint": "On a single-choice question, use “Go to” to jump to another question or end the survey based on the answer.",
+    "goTo": "Go to",
+    "goToNext": "Next question",
+    "goToEnd": "End of survey",
+    "goToQuestion": "Q{index} — {text}",
+    "untitledQuestion": "Untitled",
+    "previewBranchNote": "Answer-based branching configured.",
     "dragHint": "Drag questions with the ⋮⋮ handle to change their order.",
     "dragHandle": "Move question",
     "publish": "Publish survey",
@@ -185,7 +196,8 @@
       "multi": "Multiple choice",
       "rating": "Rating (1 to 5)",
       "number": "Number",
-      "text": "Free text"
+      "text": "Free text",
+      "section": "Section"
     },
     "ratingHint": "Respondents will rate from 1 (low) to 5 (high).",
     "textHint": "Free text answer.",
@@ -202,6 +214,7 @@
       "questions": "Add at least one question.",
       "questionText": "Each question needs a label.",
       "options": "Each choice question needs at least 2 options.",
+      "branchTarget": "A branch destination points to a missing question.",
       "publish": "Publishing failed. Please try again."
     }
   },
@@ -226,6 +239,8 @@
     "placeholder": "Your answer…",
     "required": "Required",
     "optional": "Optional",
+    "section": "Section",
+    "branchNote": "Some questions appear based on your answers.",
     "errors": {
       "notFound": "No survey found for this code.",
       "invalid": "This survey could not be read.",
@@ -274,6 +289,7 @@
     "overviewResponsesAxis": "Responses",
     "overviewAnswered": "Answered",
     "byQuestionTitle": "By question",
+    "sectionLabel": "Section",
     "average": "Average",
     "minMax": "min {min} · max {max}",
     "noTextAnswers": "No answers yet.",
